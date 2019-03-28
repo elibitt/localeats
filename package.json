@@ -1,0 +1,19 @@
+{
+  "name": "localeats",
+  "version": "1.0.0",
+  "description": "Mobile app for crowdsourced dining",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/elibitt/localeats.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/elibitt/localeats/issues"
+  },
+  "homepage": "https://github.com/elibitt/localeats#readme"
+}

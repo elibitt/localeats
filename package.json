@@ -15,5 +15,21 @@
   "bugs": {
     "url": "https://github.com/elibitt/localeats/issues"
   },
-  "homepage": "https://github.com/elibitt/localeats#readme"
+  "homepage": "https://github.com/elibitt/localeats#readme",
+  "dependencies": {
+    "braces": "^2.3.2",
+    "eslint": "^5.16.0",
+    "express": "^4.16.4",
+    "express-router": "0.0.1",
+    "jest": "^24.5.0",
+    "jest-haste-map": "^24.5.0",
+    "js-yaml": "^3.13.0",
+    "mocha": "^6.0.2",
+    "mongo": "^0.1.0",
+    "mongodb": "^3.2.2",
+    "passport": "^0.4.0",
+    "passport-local": "^1.0.0",
+    "react": "^16.8.6",
+    "react-native": "^0.59.2"
+  }
 }

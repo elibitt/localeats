@@ -2,9 +2,11 @@
   "name": "localeats",
   "version": "1.0.0",
   "description": "Mobile app for crowdsourced dining",
-  "main": "index.js",
+  "main": "app.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node server/app.js",
+    "dock": "docker-compose up --build"
   },
   "repository": {
     "type": "git",
@@ -29,6 +31,7 @@
     "mongodb": "^3.2.2",
     "passport": "^0.4.0",
     "passport-local": "^1.0.0",
+    "promise-retry": "^1.1.1",
     "react": "^16.8.6",
     "react-native": "^0.59.2"
   }

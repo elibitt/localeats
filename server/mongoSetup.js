@@ -7,7 +7,7 @@ const mongoOptions = {
 		reconnectInterval: 1000,
 		autoReconnect: true
 }
-const url = "mongodb://localhost:27017/";
+const url = "mongodb://mongodb:27017/";
 
 const promiseOptions = {
 	retries: mongoOptions.reconnectTries,
@@ -18,7 +18,7 @@ const promiseOptions = {
 
 var database
 var started = false
-const DATABASE_NAME = 'users';
+const DATABASE_NAME = 'localeats';
 
 const startMongo = () => {
 	return promiseRetry((retry, number) => {
@@ -29,8 +29,14 @@ const startMongo = () => {
 	})
 }
 
-const getDatabase = () => {
-	return database
+const getDatabase = (callback) => {
+	const loadDB = setInterval(() => {
+	  if(started) {
+			clearInterval(loadDB)
+			callback(database)
+	  }
+	}, 1000);
+
 }
 
 module.exports = {

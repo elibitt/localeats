@@ -4,6 +4,8 @@ const passport = require('passport');
 
 const mongoSetup = require(path.resolve(__dirname + '/mongoSetup'))
 
+const mealsRouter = require(path.resolve(__dirname + '/api/meals'))
+
 const port = 80
 const app = express()
 
@@ -13,6 +15,8 @@ var counter = 0
 mongoSetup.startMongo()
 // when database loads, places it into database variable
 mongoSetup.getDatabase((db) => {database = db});
+
+app.use(mealsRouter)
 
 app.get("/", (req, res) => {
   counter += 1

@@ -1,28 +1,57 @@
 const express = require('express');
 const router = express.Router();
 const path = require('path');
-const passport = require('passport');
+const uuidv4 = require('uuid/v4')
 
 const mongoSetup = require(path.resolve(__dirname + '/../mongoSetup'))
 const { hash, compare } = require(path.resolve(__dirname + '/../encrypter'))
 
-const hash = (password) => {
-  const hashed = bcrypt.hashSync(password, 10)
-  console.log(hashed)
-  return hashed
+const USERS_COLLECTION = 'users'
+const SESSIONS_COLLECTION = 'sessions'
+
 var database
 mongoSetup.getDatabase((db) => {database = db});
 
-router.post('/login', function(req, res, next) {
-  passport.authenticate('local', function(err, user, info) {
-    if (err) { return next(err); }
-    if (!user) { return res.redirect('/login'); }
-    req.logIn(user, function(err) {
-      if (err) { return next(err); }
-      return res.json({success: true})
-    });
-  })(req, res, next);
-});)
+const loggedInMiddleWare = (req, res, next) => {
+    db.collection(SESSIONS).findOne({sessionID: req.sessionID}, (err, result) => {
+      if(err) {
+        res.json({success: false, data: "An error occurred"})
+      }
+      else {
+        req.root = {username: result.username}
+        next()
+      }
+    })
+}
+
+router.post('/login', (req, res, next) => {
+  db.collection(USERS_COLLECTION).findOne({ username: req.username }, (err, user) => {
+    if (err || !user) {
+      res.json({success: false, data: "Incorect password or username"})
+    }
+    else if (!compare(password, user.password)) {
+      res.json({success: false, data: "Incorect password or username"})
+    }
+    else {
+      const newID = uuidv4();
+      db.collection(SESSIONS_COLLECTION).deleteMany({username: user.username}, (err, nDeleted) => {
+        if(err) {
+          res.json({success: false, data: "An error occurred"})
+        }
+        else {
+          db.collection(SESSIONS_COLLECTION).insertOne({sessionID: newID, username: user.username}, (err, id) => {
+            if(err) {
+              res.json({success: false, data: "An error occurred"})
+            }
+            else {
+              res.json({success: true, sessionID: newID})
+            }
+          })
+        }
+      })
+    }
+  })
+});
 
 router.post('/register', ((req, res, err) => {
   var username = req.body.username.toLowerCase()
@@ -35,10 +64,11 @@ router.post('/register', ((req, res, err) => {
     else {
       db.collection('users').insertOne({ username: username, password: hash(password) },
         function (err, user) {
-          res.json({success: true, data: "New profile created"})
+          res.json({success: true, data: "New profile created, please log in"})
         })
       }
     })
 }))
 
-module.exports = router
+
+module.exports = { router, loggedInMiddleware }

@@ -28,26 +28,33 @@ router.post("/addMeal", (req, res, next) => {
     else {
       res.json({success: true, data: "Meal uploaded successfully!"})
     }
-  }
+  })
 })
 
 router.post("/deleteMeal", (req, res, next) => {
-  database.collection(MEALS).removeOne({_id: req.meal_id, (err, result) => {
+  database.collection(MEALS).removeOne({_id: req.meal_id}, (err, result) => {
     if(err) {
       res.json({success: false, data: "Meal couldn't be added"})
     } else {
       res.json({success: true, data: "Meal deleted successfully!"})
     }
-  }
+  })
 })
 
 router.post("/reserveSeats", (req, res, next) => {
-  database.collection(MEALS).findOne({_id: req.meal_id, (err, result) => {
+  var seatsNumber = req.seatsNumber;
+  var username = req.user.username;
+  database.collection(MEALS).findOne({_id: req.meal_id}, (err, result) => {
     if(err) {
       res.json({success: false, data: "Meal couldn't be found"})
     } else {
-      if(result.openSeats >= req.seatsNumber) {
-        database.collection(MEALS).updateOne({_id: req.meal_id}, {openSeats: result.openSeats - seatsNumber}, (err, result) => {
+      if(result.openSeats >= seatsNumber) {
+        var updatedMeal = Object.assign(result,
+          {
+            openSeats: result.openSeats - seatsNumber,
+            diners: result.diners.concat([username, seatsNumber])
+          })
+        database.collection(MEALS).updateOne({_id: req.meal_id}, {updatedMeal}, (err, result) => {
           if(err) {
             res.json({success: false, data: "Couldn't update with your request"})
           } else {
@@ -57,9 +64,8 @@ router.post("/reserveSeats", (req, res, next) => {
       } else {
         res.json({success: false, data: "Not enough open seats"})
       }
-
     }
-  }
+  })
 })
 
 

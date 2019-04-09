@@ -21,6 +21,7 @@ const makeMealObject = (meal) => {
 }
 
 router.post("/addMeal", (req, res, next) => {
+  console.log(res.user)
   database.collection(MEALS).insertOne(makeMealObject(req.meal), (err, result) => {
     if(err) {
       res.json({success: false, data: "Meal couldn't be added"})

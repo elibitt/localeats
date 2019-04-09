@@ -1,7 +1,7 @@
 const express = require('express');
-const router = express.Router();
 const path = require('path');
 const uuidv4 = require('uuid/v4')
+const signInRouter = express.Router();
 
 const mongoSetup = require(path.resolve(__dirname + '/../mongoSetup'))
 const { hash, compare } = require(path.resolve(__dirname + '/../encrypter'))
@@ -12,7 +12,7 @@ const SESSIONS_COLLECTION = 'sessions'
 var database
 mongoSetup.getDatabase((db) => {database = db});
 
-const loggedInMiddleWare = (req, res, next) => {
+const isLoggedInMiddleware = (req, res, next) => {
     db.collection(SESSIONS).findOne({sessionID: req.sessionID}, (err, result) => {
       if(err) {
         res.json({success: false, data: "An error occurred"})
@@ -24,7 +24,7 @@ const loggedInMiddleWare = (req, res, next) => {
     })
 }
 
-router.post('/login', (req, res, next) => {
+signInRouter.post('/login', (req, res, next) => {
   db.collection(USERS_COLLECTION).findOne({ username: req.username }, (err, user) => {
     if (err || !user) {
       res.json({success: false, data: "Incorect password or username"})
@@ -53,7 +53,7 @@ router.post('/login', (req, res, next) => {
   })
 });
 
-router.post('/register', ((req, res, err) => {
+signInRouter.post('/register', ((req, res, err) => {
   var username = req.body.username.toLowerCase()
   var password = req.body.password
   var usernameExists = false
@@ -71,4 +71,4 @@ router.post('/register', ((req, res, err) => {
 }))
 
 
-module.exports = { router, loggedInMiddleware }
+module.exports = { signInRouter, isLoggedInMiddleware }

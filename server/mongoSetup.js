@@ -36,7 +36,6 @@ const getDatabase = (callback) => {
 			callback(database)
 	  }
 	}, 1000);
-
 }
 
 module.exports = {

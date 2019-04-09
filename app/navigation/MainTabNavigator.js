@@ -8,57 +8,57 @@ import CreateScreen from '../screens/CreateScreen';
 import ProfileScreen from '../screens/ProfileScreen';
 
 const HomeStack = createStackNavigator({
-  Home: HomeScreen,
+	Home: HomeScreen,
 });
 
 HomeStack.navigationOptions = {
-  tabBarLabel: 'Home',
-  tabBarIcon: ({ focused }) => (
-    <TabBarIcon
-      focused={focused}
-      name={
-        Platform.OS === 'ios'
-          ? 'ios-home'
-          : 'md-home'
-      }
-    />
-  ),
+	tabBarLabel: 'Home',
+	tabBarIcon: ({ focused }) => (
+		<TabBarIcon
+			focused={focused}
+			name={
+				Platform.OS === 'ios'
+					? 'ios-home'
+					: 'md-home'
+			}
+		/>
+	),
 };
 
 const CreateStack = createStackNavigator({
-  Create: CreateScreen,
+	Create: CreateScreen,
 });
 
 CreateStack.navigationOptions = {
-  tabBarLabel: 'Create',
-  tabBarIcon: ({ focused }) => (
-    <TabBarIcon
-      focused={focused}
-      name={
-        Platform.OS === 'ios'
-          ? `ios-add-circle${focused ? '' : '-outline'}`
-          : 'md-add-circle'
-      }
-    />
-  ),
+	tabBarLabel: 'Create',
+	tabBarIcon: ({ focused }) => (
+		<TabBarIcon
+			focused={focused}
+			name={
+				Platform.OS === 'ios'
+					? `ios-add-circle${focused ? '' : '-outline'}`
+					: 'md-add-circle'
+			}
+		/>
+	),
 };
 
 const ProfileStack = createStackNavigator({
-  Profile: ProfileScreen,
+	Profile: ProfileScreen,
 });
 
 ProfileStack.navigationOptions = {
-  tabBarLabel: 'Profile',
-  tabBarIcon: ({ focused }) => (
-    <TabBarIcon
-      focused={focused}
-      name={Platform.OS === 'ios' ? 'ios-contact' : 'md-contact'}
-    />
-  ),
+	tabBarLabel: 'Profile',
+	tabBarIcon: ({ focused }) => (
+		<TabBarIcon
+			focused={focused}
+			name={Platform.OS === 'ios' ? 'ios-contact' : 'md-contact'}
+		/>
+	),
 };
 
 export default createBottomTabNavigator({
-  HomeStack,
-  CreateStack,
-  ProfileStack,
+	HomeStack,
+	CreateStack,
+	ProfileStack,
 });

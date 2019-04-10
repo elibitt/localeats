@@ -24,12 +24,15 @@ const isLoggedInMiddleware = (req, res, next) => {
     })
 }
 
+/*
+Takes in a username and password
+*/
 signInRouter.post('/login', (req, res, next) => {
   db.collection(USERS_COLLECTION).findOne({ username: req.username }, (err, user) => {
     if (err || !user) {
       res.json({success: false, data: "Incorect password or username"})
     }
-    else if (!compare(password, user.password)) {
+    else if (!compare(req.password, user.password)) {
       res.json({success: false, data: "Incorect password or username"})
     }
     else {
@@ -53,6 +56,9 @@ signInRouter.post('/login', (req, res, next) => {
   })
 });
 
+/*
+Takes in a username and password
+*/
 signInRouter.post('/register', ((req, res, err) => {
   var username = req.body.username.toLowerCase()
   var password = req.body.password

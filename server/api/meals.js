@@ -20,6 +20,12 @@ const makeMealObject = (meal) => {
   )
 }
 
+/*
+Takes in a meal object
+must have seats: integer field
+returns a meal ID: string
+*/
+
 router.post("/addMeal", (req, res, next) => {
   console.log(res.user)
   database.collection(MEALS).insertOne(makeMealObject(req.meal), (err, result) => {
@@ -27,10 +33,14 @@ router.post("/addMeal", (req, res, next) => {
       res.json({success: false, data: "Meal couldn't be added"})
     }
     else {
-      res.json({success: true, data: "Meal uploaded successfully!"})
+      res.json({success: true, data: "Meal uploaded successfully!", mealID: result._id })
     }
   })
 })
+
+/*
+Takes in a meal_id: string
+*/
 
 router.post("/deleteMeal", (req, res, next) => {
   database.collection(MEALS).removeOne({_id: req.meal_id}, (err, result) => {
@@ -42,6 +52,9 @@ router.post("/deleteMeal", (req, res, next) => {
   })
 })
 
+/*
+Takes in a meal_id: string, seatsNumber: integer
+*/
 router.post("/reserveSeats", (req, res, next) => {
   var seatsNumber = req.seatsNumber;
   var username = req.user.username;

@@ -1,10 +1,14 @@
 import React from "react";
-import { View } from "react-native";
+import { View, Image, StyleSheet } from "react-native";
 import { Card, Button, Input } from 'react-native-elements';
 import { onSignIn } from "../auth";
 
 export default ({ navigation }) => (
 	<View style={{ paddingVertical: 20 }}>
+		<Image
+	    source={require('../assets/images/logov1.png')}
+	    style={styles.welcomeImage}
+	  />
 		<Card>
 			<Input label="Email" placeholder="Email address..." />
 			<Input label="Password" secureTextEntry placeholder="Password..." />
@@ -25,3 +29,13 @@ export default ({ navigation }) => (
 		</Card>
 	</View>
 );
+
+const styles = StyleSheet.create({
+  welcomeImage: {
+    width: 100,
+    height: 80,
+    resizeMode: 'contain',
+    marginTop: 3,
+    marginLeft: -10,
+  },
+});

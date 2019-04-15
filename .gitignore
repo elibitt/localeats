@@ -66,3 +66,4 @@ data-node/
 # Randoms
 .DS_Store
 .nosync
+.env

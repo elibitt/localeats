@@ -11,5 +11,5 @@ RUN apk add --no-cache --virtual deps \
   && apk del deps
 COPY server ./server
 
-EXPOSE 80
+EXPOSE $port
 CMD [ "npm", "start" ]

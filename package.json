@@ -4,7 +4,7 @@
   "description": "Mobile app for crowdsourced dining",
   "main": "app.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "test": "mocha server/__tests__/* --exit --timeout 20000",
     "start": "node server/app.js",
     "dock": "docker-compose up --build"
   },
@@ -20,7 +20,11 @@
   "homepage": "https://github.com/elibitt/localeats#readme",
   "dependencies": {
     "bcrypt": "^3.0.5",
+    "body-parser": "^1.18.3",
     "braces": "^2.3.2",
+    "chai": "^4.2.0",
+    "chai-http": "^4.2.1",
+    "dotenv": "^7.0.0",
     "eslint": "^5.16.0",
     "express": "^4.16.4",
     "express-router": "0.0.1",
@@ -29,6 +33,8 @@
     "js-yaml": "^3.13.0",
     "mocha": "^6.0.2",
     "mongo": "^0.1.0",
+    "mongo-mock": "^3.4.0",
+    "mongo-unit": "^1.4.4",
     "mongodb": "^3.2.2",
     "passport": "^0.4.0",
     "passport-local": "^1.0.0",

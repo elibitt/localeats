@@ -55,8 +55,9 @@ describe('USERS', () => {
               assert(false)
               done()
             } else {
+              console.log(res.body)
               res.body.should.have.property('success', true)
-              res.body.should.have.property('data', "New profile created, please log in")
+              res.body.should.have.property('sessionID');
               done()
             }
           })
@@ -73,7 +74,7 @@ describe('USERS', () => {
               done()
             } else {
               res.body.should.have.property('success', true)
-              res.body.should.have.property('data')
+              res.body.should.have.property('sessionID')
               done()
             }
           })
@@ -93,7 +94,6 @@ describe('USERS', () => {
             }
           })
       });
-
     it('login_name_just_registered', (done) => {
       chai.request(app)
           .post('/api/signin/login')
@@ -104,7 +104,7 @@ describe('USERS', () => {
               done()
             } else {
               res.body.should.have.property('success', true)
-              res.body.should.have.property('data')
+              res.body.should.have.property('sessionID')
               done()
             }
           })

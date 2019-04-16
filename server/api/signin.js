@@ -49,7 +49,7 @@ signInRouter.post('/login', (req, res, next) => {
               res.json({success: false, data: "An error occurred"})
             }
             else {
-              res.json({success: true, data: newID})
+              res.json({success: true, sessionID: newID})
             }
           })
         }
@@ -57,6 +57,25 @@ signInRouter.post('/login', (req, res, next) => {
     }
   })
 });
+
+/* works through the logged in middleware */
+signInRouter.post('/logout', isLoggedInMiddleware, (req, res, next) => {
+    var username = req.root.username
+    database.collection(SESSIONS).deleteMany({username: user.username}, (err, nDeleted) => {
+        if(err || nDeleted <= 0) {
+          res.json({success: false, data: "User's session ID could not be found"})
+        }
+        else {
+          res.json({success: true, data: "User was logged out"})
+        }
+    })
+})
+
+/* works through the logged in middleware */
+signInRouter.post('/getUsername', isLoggedInMiddleware, (req, res, next) => {
+    var username = req.root.username
+    res.json({success: true, data: username})
+})
 
 /*
 Takes in a username and password
@@ -72,7 +91,19 @@ signInRouter.post('/register', ((req, res, err) => {
     else {
       database.collection(USERS).insertOne({ username: username, password: hash(password) },
         function (err, user) {
-          res.json({success: true, data: "New profile created, please log in"})
+          if(err) {
+              res.json({success: false, data: "An error occurred"})
+          } else {
+            const newID = uuidv4();
+            database.collection(SESSIONS).insertOne({sessionID: newID, username: username}, (err, id) => {
+                if(err) {
+                  res.json({success: false, data: "An error occurred"})
+                }
+                else {
+                  res.json({success: true, sessionID: newID})
+                }
+            })
+          }
         })
       }
     })

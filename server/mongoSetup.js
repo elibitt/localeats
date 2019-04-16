@@ -1,5 +1,6 @@
 const MongoClient = require('mongodb').MongoClient;
 const promiseRetry = require('promise-retry');
+const dotenv = require('dotenv').config()
 
 const mongoOptions = {
 		useNewUrlParser: true,
@@ -7,7 +8,7 @@ const mongoOptions = {
 		reconnectInterval: 1000,
 		autoReconnect: true
 }
-const url = "mongodb://mongodb:27017/";
+const url = process.env.MONGODB_URL
 
 const promiseOptions = {
 	retries: mongoOptions.reconnectTries,
@@ -26,6 +27,7 @@ const startMongo = () => {
 	}, promiseOptions).then(mongoClient => {
 		database = mongoClient.db(DATABASE_NAME)
 		started = true;
+		console.log('mongoloaded')
 	})
 }
 

@@ -44,9 +44,9 @@ before(done => {
           .send(JSON.stringify({username: TEST_NAME, password: TEST_PASS}))
           .end((err, res, body) => {
               res.body.should.have.property('success', true)
-              test_session_id = res.body.data
+              test_session_id = res.body.sessionID
               done()
-          })})
+      })})
 })
 
 describe('MEALS', () => {

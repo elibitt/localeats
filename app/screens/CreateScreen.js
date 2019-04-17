@@ -18,7 +18,23 @@ export default class LinksScreen extends React.Component {
   render() {
     return (
       <ScrollView style={styles.container}>
-        <Text>This page will be for creating new meals.</Text>
+        <Card>
+          <Input label="cuisine"  placeholder="Cuisine" />
+          <Input label="seats"    placeholder="Open Seats " />
+          <TextInput
+            label="description"
+            placeholder="Describe your meal..."
+            multiline={true}
+            numberOfLines={4}
+          />
+          <Button
+            buttonStyle={{ marginTop: 20, backgroundColor: "#03A9F4" }}
+            title="SIGN IN"
+            onPress={() => {
+              onSignIn().then(() => navigation.navigate("SignedIn"));
+            }}
+          />
+        </Card>
       </ScrollView>
     );
   }

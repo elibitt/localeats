@@ -1,0 +1,28 @@
+I was in charge of the backend for the application, and so far I've done the following
+
+- Created a database module that
+  - Loads the mongoDB
+  - Allows all modules to load the mongoDB simply without worrying about when it boots up
+
+- Created a custom login system that
+  - Registers new users
+  - Allows them to securely login
+  - Keeps them logged in while preventing invalid data access
+  - Allows them to logout
+  - Created middleware that allows ensures the requester is logged in and passes the username to the next function
+
+- Created a meals API that
+  - Allows users to create new meals
+  - Allows users to reserve seats at meals
+  - Allows users to delete their meals
+
+- Written tests that ensure the behavior of most of the above functions (logout isn't tested yet)
+
+I've also set up a docker file that builds the mongo + express backend into
+a single container that can be deployed to a VM
+
+- Still to do
+  - Allow users to see nearby meals
+  - Allow users to see their own meals and edit them
+  - Allow diners to review chefs and chefs to review diners
+  - Test the remaining functions

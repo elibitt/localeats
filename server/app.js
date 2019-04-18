@@ -21,24 +21,4 @@ mongoSetup.getDatabase((db) => {database = db});
 app.use("/api/signin", signInRouter)
 app.use("/api/meals", isLoggedInMiddleware, mealsRouter)
 
-app.get("/", (req, res) => {
-  counter += 1
-  database.collection('count').replaceOne({name: "counter"}, {name: "counter", value: counter}, {upsert: true}, (err, result) => {
-  })
-  console.log(counter)
-  res.json("Got it!")
-})
-
-app.get("/show", (req, res) => {
-  database.collection('count').findOne({name: "counter"}, (err, result) => {
-    if(err) {
-      res.json("ERROR")
-    }
-    else {
-      console.log(result)
-      res.json(result.value)
-    }
-  })
-})
-
 app.listen(port, () => console.log("listening on port: ", port))

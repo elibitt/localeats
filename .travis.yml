@@ -14,10 +14,8 @@ env:
     - DOCKER_MACHINE_NAME="localeats"
 
 script:
-  - cd ./server && npm install
-  - npm test
-  - cd ..
   - docker-compose build
+  - npm test
 
 deploy:
   skip_cleanup: true

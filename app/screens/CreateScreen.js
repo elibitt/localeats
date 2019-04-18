@@ -9,6 +9,19 @@ import {
   View,
 } from 'react-native';
 import { ExpoLinksView } from '@expo/samples';
+import { ImagePicker } from 'expo';
+
+pickImage = async () => {
+  const result = await ImagePicker.launchImageLibraryAsync({
+    allowsEditing: true,
+    base64: true,
+  });
+  if (!result.cancelled) {
+    this.setState({
+      image: result.uri,
+    });
+  }
+};
 
 export default class LinksScreen extends React.Component {
   static navigationOptions = {

@@ -1,13 +1,21 @@
 import React from 'react';
 import {
-  Image,
   Platform,
   ScrollView,
   StyleSheet,
-  Text,
   TouchableOpacity,
   View,
 } from 'react-native';
+import {
+  Text,
+  Image,
+  Card,
+  Tile,
+  Icon,
+  Button,
+  ListItem,
+  Avatar,
+} from 'react-native-elements';
 import { WebBrowser } from 'expo';
 
 import { MonoText } from '../components/StyledText';
@@ -29,8 +37,45 @@ export default class HomeScreen extends React.Component {
           </View>
 
           <View style={styles.getStartedContainer}>
-
             <Text style={styles.getStartedText}>Welcome to LocalEats</Text>
+          </View>
+          <View>
+          <Card
+            image={require('../assets/images/food/burrito.jpg')}>
+            <Text h4>Authentic Mexican Burritos</Text>
+            <Text style={{marginBottom: 10}}>
+              A generations-old recipe, each burrito is crafted carefully just for you!
+            </Text>
+            <Button
+              icon={<Icon type='ionicon' name='ios-clipboard' color='#ffffff' iconStyle={{marginRight:10}}/>}
+              backgroundColor='#03A9F4'
+              buttonStyle={{borderRadius: 0, marginLeft: 0, marginRight: 0, marginBottom: 0}}
+              title='RESERVE THIS MEAL' />
+          </Card>
+          <Card
+            image={require('../assets/images/food/avo.jpg')}>
+            <Text h4>Avocado Toast</Text>
+            <Text style={{marginBottom: 10}}>
+              You know you want it.
+            </Text>
+            <Button
+              icon={<Icon type='ionicon' name='ios-clipboard' color='#ffffff' iconStyle={{marginRight:10}}/>}
+              backgroundColor='#03A9F4'
+              buttonStyle={{borderRadius: 0, marginLeft: 0, marginRight: 0, marginBottom: 0}}
+              title='RESERVE THIS MEAL' />
+          </Card>
+          <Card
+            image={require('../assets/images/food/pancakes.jpg')}>
+            <Text h4>Pancakes!</Text>
+            <Text style={{marginBottom: 10}}>
+              Fluffy and delicious!
+            </Text>
+            <Button
+              icon={<Icon type='ionicon' name='ios-clipboard' color='#ffffff' iconStyle={{marginRight:10}}/>}
+              backgroundColor='#03A9F4'
+              buttonStyle={{borderRadius: 0, marginLeft: 0, marginRight: 0, marginBottom: 0}}
+              title='RESERVE THIS MEAL' />
+          </Card>
 
           </View>
 

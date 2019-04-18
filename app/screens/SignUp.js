@@ -89,8 +89,8 @@ export default class SignUp extends Component{
 		      })
 		    }).then(res => res.json())
 		    .then(response => this.handleAPIRes(response))
-		    .catch(err => {
-		    	console.error('Error:', error);
+		    .catch(error => {
+		    	console.error('Error!:', error);
 		    	Alert.alert(error);
 		    });
     	}

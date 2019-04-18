@@ -2,7 +2,6 @@ const bcrypt = require('bcrypt')
 
 const hash = (password) => {
   const hashed = bcrypt.hashSync(password, 10)
-  console.log(hashed)
   return hashed
 }
 

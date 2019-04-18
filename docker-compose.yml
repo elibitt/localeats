@@ -4,10 +4,11 @@ services:
     build: .
     ports:
       - "80:80"
-    restart: always
     environment:
       NODE_ENV: production
-      PORT: 80 
+      PORT: 80
+      MONGODB_URL: mongodb://mongodb:27017/
+
     networks:
        - webappnetwork
     depends_on:

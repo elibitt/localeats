@@ -1,6 +1,7 @@
 import React from 'react';
 import { Card, Button } from "react-native-elements";
-import { onSignOut } from "../auth";
+import { onSignOut, getSessionID } from "../auth";
+
 
 import {
   Image,
@@ -14,9 +15,22 @@ import {
 import { ExpoConfigView } from '@expo/samples';
 
 export default class SettingsScreen extends React.Component {
+  constructor(props){
+    super(props);
+
+    this.state = {
+      sessionID: '',
+    }
+
+    getSessionID().then((id)=>{
+      this.setState({sessionID: id});
+    });
+
+  }
   static navigationOptions = {
     title: 'Profile',
   };
+
 
   render() {
     return (
@@ -36,6 +50,7 @@ export default class SettingsScreen extends React.Component {
           >
             <Text style={{ color: "white", fontSize: 28 }}>JD</Text>
           </View>
+          <Text style={{ alignSelf: "center", fontSize: 13, marginBottom:20 }}>{"SessionID: "+this.state.sessionID}</Text>
           <Button
             backgroundColor="#03A9F4"
             title="SIGN OUT"

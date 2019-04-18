@@ -6,14 +6,14 @@ const signInRouter = express.Router();
 const mongoSetup = require(path.resolve(__dirname + '/../mongoSetup'))
 const { hash, compare } = require(path.resolve(__dirname + '/../encrypter'))
 
-const USERS_COLLECTION = 'users'
-const SESSIONS_COLLECTION = 'sessions'
+const USERS = 'users'
+const SESSIONS = 'sessions'
 
 var database
 mongoSetup.getDatabase((db) => {database = db});
 
 const isLoggedInMiddleware = (req, res, next) => {
-    db.collection(SESSIONS).findOne({sessionID: req.sessionID}, (err, result) => {
+    database.collection(SESSIONS).findOne({sessionID: req.body.sessionID}, (err, result) => {
       if(err) {
         res.json({success: false, data: "An error occurred"})
       }
@@ -28,21 +28,23 @@ const isLoggedInMiddleware = (req, res, next) => {
 Takes in a username and password
 */
 signInRouter.post('/login', (req, res, next) => {
-  db.collection(USERS_COLLECTION).findOne({ username: req.username }, (err, user) => {
+  var username = req.body.username.toLowerCase()
+  var password = req.body.password
+  database.collection(USERS).findOne({ username: username }, (err, user) => {
     if (err || !user) {
-      res.json({success: false, data: "Incorect password or username"})
+      res.json({success: false, data: "No such username exists"})
     }
-    else if (!compare(req.password, user.password)) {
+    else if (!compare(password, user.password)) {
       res.json({success: false, data: "Incorect password or username"})
     }
     else {
       const newID = uuidv4();
-      db.collection(SESSIONS_COLLECTION).deleteMany({username: user.username}, (err, nDeleted) => {
+      database.collection(SESSIONS).deleteMany({username: user.username}, (err, nDeleted) => {
         if(err) {
           res.json({success: false, data: "An error occurred"})
         }
         else {
-          db.collection(SESSIONS_COLLECTION).insertOne({sessionID: newID, username: user.username}, (err, id) => {
+          database.collection(SESSIONS).insertOne({sessionID: newID, username: user.username}, (err, id) => {
             if(err) {
               res.json({success: false, data: "An error occurred"})
             }
@@ -56,6 +58,25 @@ signInRouter.post('/login', (req, res, next) => {
   })
 });
 
+/* works through the logged in middleware */
+signInRouter.post('/logout', isLoggedInMiddleware, (req, res, next) => {
+    var username = req.root.username
+    database.collection(SESSIONS).deleteMany({username: user.username}, (err, nDeleted) => {
+        if(err || nDeleted <= 0) {
+          res.json({success: false, data: "User's session ID could not be found"})
+        }
+        else {
+          res.json({success: true, data: "User was logged out"})
+        }
+    })
+})
+
+/* works through the logged in middleware */
+signInRouter.post('/getUsername', isLoggedInMiddleware, (req, res, next) => {
+    var username = req.root.username
+    res.json({success: true, data: username})
+})
+
 /*
 Takes in a username and password
 */
@@ -63,14 +84,26 @@ signInRouter.post('/register', ((req, res, err) => {
   var username = req.body.username.toLowerCase()
   var password = req.body.password
   var usernameExists = false
-  db.collection('users').findOne({ username: username }, function (err, user) {
+  database.collection(USERS).findOne({ username: username }, function (err, user) {
     if (user != null) {
       res.json({success: false, data: "Username already exists"})
     }
     else {
-      db.collection('users').insertOne({ username: username, password: hash(password) },
+      database.collection(USERS).insertOne({ username: username, password: hash(password) },
         function (err, user) {
-          res.json({success: true, data: "New profile created, please log in"})
+          if(err) {
+              res.json({success: false, data: "An error occurred"})
+          } else {
+            const newID = uuidv4();
+            database.collection(SESSIONS).insertOne({sessionID: newID, username: username}, (err, id) => {
+                if(err) {
+                  res.json({success: false, data: "An error occurred"})
+                }
+                else {
+                  res.json({success: true, sessionID: newID})
+                }
+            })
+          }
         })
       }
     })

@@ -18,9 +18,8 @@ const isLoggedInMiddleware = (req, res, next) => {
         res.json({success: false, data: "An error occurred"})
       }
       else {
-          console.log("Middleware: "+result);
-          req.root = {username: result.username}
-          next()
+        req.root = {username: result.username}
+        next()
       }
     })
 }
@@ -63,6 +62,7 @@ signInRouter.post('/login', (req, res, next) => {
 signInRouter.post('/logout', isLoggedInMiddleware, (req, res, next) => {
     var username = req.root.username
     database.collection(SESSIONS).deleteMany({username: username}, (err, nDeleted) => {
+
         if(err || nDeleted <= 0) {
           res.json({success: false, data: "User's session ID could not be found"})
         }

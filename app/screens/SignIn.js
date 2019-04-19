@@ -34,6 +34,8 @@ export default class SignUp extends Component{
       isPasswordValid: true,
 		}
 		this.login = this.login.bind(this);
+    this.validateEmail = this.validateEmail.bind(this);
+    this.handleAPIRes = this.handleAPIRes.bind(this);
 
 	}
 
@@ -43,9 +45,10 @@ export default class SignUp extends Component{
   }
 
   handleAPIRes(res) {
+
   	if (res.success){
-  		console.log(JSON.stringify(res.sessionID));
-  		onSignIn(JSON.stringify(res.sessionID));
+  		console.log(res.sessionID);
+  		onSignIn(res.sessionID, this.state.email);
   		LayoutAnimation.easeInEaseOut();
     	this.setState({
         isLoading: false,
@@ -73,7 +76,7 @@ export default class SignUp extends Component{
 			
     	if (this.state.isEmailValid && this.state.isPasswordValid){
 	    	//send to API
-		    fetch('http://localhost/api/signin/login', {
+		    fetch('http://localeats.westus.cloudapp.azure.com/api/signin/login', {
 		      method: 'POST',
 		      headers: {
 		        'Content-Type': 'application/json',
@@ -83,7 +86,7 @@ export default class SignUp extends Component{
 		        password: password
 		      })
 		    }).then(res => res.json())
-		    .then(response => this.handleAPIRes(response))
+		    .then(response => this.handleAPIRes(response, this.state.email))
 		    .catch(err => {
 		    	console.error('Error:', err);
 		    	Alert.alert(err);

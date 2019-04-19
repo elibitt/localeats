@@ -61,7 +61,8 @@ signInRouter.post('/login', (req, res, next) => {
 /* works through the logged in middleware */
 signInRouter.post('/logout', isLoggedInMiddleware, (req, res, next) => {
     var username = req.root.username
-    database.collection(SESSIONS).deleteMany({username: user.username}, (err, nDeleted) => {
+    database.collection(SESSIONS).deleteMany({username: username}, (err, nDeleted) => {
+
         if(err || nDeleted <= 0) {
           res.json({success: false, data: "User's session ID could not be found"})
         }

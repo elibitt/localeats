@@ -1,21 +1,40 @@
 import { AsyncStorage } from "react-native";
 
 export const USER_KEY = "auth-session-id";
+export const USER_EMAIL = "current-user-email";
 
-export const onSignIn = async (sessionID) => {
+export const onSignIn = async (sessionID, email) => {
+  // Save session ID to storage
+  console.log(sessionID);
+  console.log(email);
   try {
-    await AsyncStorage.setItem(USER_KEY, sessionID);
+    await AsyncStorage.multiSet([[USER_KEY, sessionID],[USER_EMAIL, email]]);
   } catch (error) {
-    console.log("Error saving sessionID to async storage");
+    console.log("Error saving sessionID/email to async storage");
   }
+  
 };
 
-export const onSignOut = async () => {
+export const onSignOut = async (id) => {
+  console.log(id);
   try {
     await AsyncStorage.removeItem(USER_KEY);
   } catch (error) {
     console.log("Error removing sessionID from async storage");
   }
+  //send to API
+	fetch('http://localeats.westus.cloudapp.azure.com/api/signin/logout', {
+	  method: 'POST',
+	  headers: {
+	    'Content-Type': 'application/json',
+	  },
+	  body: JSON.stringify({
+	    sessionID: id
+	  })
+	}).then(res => res.json())
+	.catch(err => {
+		console.error('Error:', err);
+	});
 };
 
 export const isSignedIn = () => {
@@ -41,6 +60,19 @@ export const getSessionID = async () => {
         });
   } catch (error) {
     console.log("Error getting sessionID from async storage");
+  }
+  return collect;
+};
+
+export const getUserEmail = async () => {
+	var value, collect;
+  try {
+    value = await AsyncStorage.getItem(USER_EMAIL).then(
+        (item) => {
+          collect = item;
+        });
+  } catch (error) {
+    console.log("Error getting email from async storage");
   }
   return collect;
 };

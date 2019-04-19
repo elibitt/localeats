@@ -12,11 +12,10 @@ env:
     - DOCKER_HOST="tcp://52.160.65.103:2376"
     - DOCKER_CERT_PATH="$TRAVIS_BUILD_DIR/azure"
     - DOCKER_MACHINE_NAME="localeats"
+    - PORT="80"
+    - MONGODB_URL="mongodb://mongodb:27017/"
 
 script:
-  - cd ./server && npm install
-  - npm test
-  - cd ..
   - docker-compose build
 
 deploy:

@@ -1,6 +1,6 @@
 import React from 'react';
 import { Card, Button } from "react-native-elements";
-import { onSignOut, getSessionID } from "../auth";
+import { onSignOut, getSessionID, getUserEmail } from "../auth";
 
 
 import {
@@ -20,10 +20,14 @@ export default class SettingsScreen extends React.Component {
 
     this.state = {
       sessionID: '',
+      email: '',
     }
 
     getSessionID().then((id)=>{
       this.setState({sessionID: id});
+    });
+    getUserEmail().then((addy)=>{
+      this.setState({email: addy});
     });
 
   }
@@ -51,10 +55,12 @@ export default class SettingsScreen extends React.Component {
             <Text style={{ color: "white", fontSize: 28 }}>JD</Text>
           </View>
           <Text style={{ alignSelf: "center", fontSize: 13, marginBottom:20 }}>{"SessionID: "+this.state.sessionID}</Text>
+          <Text style={{ alignSelf: "center", fontSize: 13, marginBottom:20 }}>{"Email: "+this.state.email}</Text>
+
           <Button
             backgroundColor="#03A9F4"
             title="SIGN OUT"
-            onPress={() => onSignOut().then(() => this.props.navigation.navigate('SignedOut'))}
+            onPress={() => onSignOut(this.state.sessionID).then(() => this.props.navigation.navigate('SignedOut'))}
           />
         </Card>
       </View>

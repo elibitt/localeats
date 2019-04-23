@@ -19,8 +19,11 @@ const makeMealObject = (meal, username) => {
   return Object.assign(meal,
     {
       chef: username,
+      diners: [],
+      cuisine: meal.cuisine,
       openSeats: meal.seats,
-      diners: []
+      description: meal.description,
+      image: meal.image,
     }
   )
 }

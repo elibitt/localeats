@@ -19,7 +19,7 @@ export default class LinksScreen extends React.Component {
       cuisine: '',
       seats: 0,
       description: '',
-      image: null,
+      image: ''
     };
     this.handleInputChange = this.handleInputChange.bind(this);
     this.handleSubmit = this.handleSubmit.bind(this);
@@ -44,17 +44,19 @@ export default class LinksScreen extends React.Component {
       "image": this.state.image,
     }));
 
-    fetch('http://0.0.0.0:8080/api/meals/', {
+    fetch('http://0.0.0.0:8080/api/meals/addMeal', {
       method: 'POST',
       headers: {
         'Accept': 'application/json',
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        "cuisine": this.state.cuisine,
-        "seats": this.state.seats,
-        "description": this.state.description,
-        "image": this.state.image,
+        "meal": {
+          "cuisine": this.state.cuisine,
+          "seats": this.state.seats,
+          "description": this.state.description,
+          "image": this.state.image
+        }
       })
     }).then(res => res.json())
     .then(response => console.log('Success:', JSON.stringify(response)))

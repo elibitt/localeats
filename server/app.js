@@ -5,7 +5,7 @@ const bodyparser = require('body-parser')
 
 const mongoSetup = require(path.resolve(__dirname + '/mongoSetup'))
 
-const mealsRouter = require(path.resolve(__dirname + '/api/meals'))
+const mealsRouter = require(path.resolve(__dirname + '/api/meals/mealsEndpoints'))
 
 const { signInRouter, isLoggedInMiddleware } = require(path.resolve(__dirname + '/api/signin'))
 

@@ -13,6 +13,7 @@ var database
 mongoSetup.getDatabase((db) => {database = db});
 
 const isLoggedInMiddleware = (req, res, next) => {
+<<<<<<< HEAD
     database.collection(SESSIONS).findOne({sessionID: req.body.sessionID}, (err, result) => {
       if(err) {
         res.json({success: false, data: "An error occurred"})
@@ -22,6 +23,21 @@ const isLoggedInMiddleware = (req, res, next) => {
         next()
       }
     })
+=======
+    if(!req.sessionID) {
+      res.json({success: false, data: "No sessionID was given with the request"})
+    } else {
+      db.collcetion(SESSIONS).findOne({sessionID: req.sessionID}, (err, result) => {
+        if(err) {
+          res.json({success: false, data: "An error occurred"})
+        }
+        else {
+          req.root = {username: result.username}
+          next()
+        }
+      })
+    }
+>>>>>>> Refactored meal logic + endpoint file structure and added getMyMeals
 }
 
 /*

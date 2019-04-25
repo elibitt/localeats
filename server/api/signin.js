@@ -13,15 +13,19 @@ var database
 mongoSetup.getDatabase((db) => {database = db});
 
 const isLoggedInMiddleware = (req, res, next) => {
-    db.collection(SESSIONS).findOne({sessionID: req.sessionID}, (err, result) => {
-      if(err) {
-        res.json({success: false, data: "An error occurred"})
-      }
-      else {
-        req.root = {username: result.username}
-        next()
-      }
-    })
+    if(!req.sessionID) {
+      res.json({success: false, data: "No sessionID was given with the request"})
+    } else {
+      db.collcetion(SESSIONS).findOne({sessionID: req.sessionID}, (err, result) => {
+        if(err) {
+          res.json({success: false, data: "An error occurred"})
+        }
+        else {
+          req.root = {username: result.username}
+          next()
+        }
+      })
+    }
 }
 
 /*

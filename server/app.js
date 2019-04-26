@@ -1,6 +1,7 @@
 const express = require('express');
 const path = require('path');
 const passport = require('passport');
+const bodyparser = require('body-parser')
 
 const mongoSetup = require(path.resolve(__dirname + '/mongoSetup'))
 
@@ -8,7 +9,10 @@ const mealsRouter = require(path.resolve(__dirname + '/api/meals/mealsEndpoints'
 
 const { signInRouter, isLoggedInMiddleware } = require(path.resolve(__dirname + '/api/signin'))
 
-const port = 80
+console.log("the port is ", process.env.PORT)
+console.log("the mongo is ", process.env.MONGODB_URL)
+const port = parseInt(process.env.PORT)
+
 const app = express()
 
 var database
@@ -18,7 +22,10 @@ mongoSetup.startMongo()
 // when database loads, places it into database variable
 mongoSetup.getDatabase((db) => {database = db});
 
+app.use(bodyparser.json())
 app.use("/api/signin", signInRouter)
 app.use("/api/meals", isLoggedInMiddleware, mealsRouter)
 
-app.listen(port, () => console.log("listening on port: ", port))
+server = app.listen(port, () => console.log("listening on port: ", port))
+
+module.exports = {app, server}

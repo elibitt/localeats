@@ -7,7 +7,7 @@ const mongoOptions = {
 		reconnectInterval: 1000,
 		autoReconnect: true
 }
-const url = "mongodb://mongodb:27017/";
+const url = process.env.MONGODB_URL
 
 const promiseOptions = {
 	retries: mongoOptions.reconnectTries,
@@ -26,6 +26,7 @@ const startMongo = () => {
 	}, promiseOptions).then(mongoClient => {
 		database = mongoClient.db(DATABASE_NAME)
 		started = true;
+		console.log("Mongo connected")
 	})
 }
 

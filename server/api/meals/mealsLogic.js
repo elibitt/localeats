@@ -2,6 +2,7 @@ const express = require('express');
 const path = require('path');
 const router = express.Router();
 
+const reservationLogic = require('./reservationLogic')
 const mongoSetup = require(path.resolve(__dirname + '/../../mongoSetup'))
 const ObjectID = require('mongodb').ObjectID
 
@@ -113,9 +114,36 @@ const reserveSeats = (mealID, reserver, seatsNumber, next) => {
   })
 }
 
+const unreserveSeats = (mealID, reserver, seatsNumber, next) => {
+  database.collection(MEALS).findOne({_id: ObjectID(mealID)}, (err, result) => {
+    if(err) {
+      next({success: false, data: "Meal couldn't be found"})
+    } else {
+      if(diners.includes({diner:reserver, seatsReserved: seatsNumber})) {
+        var updatedMeal = Object.assign(result,
+          {
+            open_seats: result.open_seats + seatsNumber,
+            diners: result.diners.filter(x => x.diner != reserver)
+          })
+        database.collection(MEALS).updateOne({_id: ObjectID(meal_id)}, {updatedMeal}, (err, result) => {
+          if(err) {
+            next({success: false, data: "Couldn't update with your request"})
+          } else {
+            reservationLogic.deleteReservation(mealID, reserver, seatsNumber, next)
+          }
+        })
+      } else {
+        next({success: false, data: "That reservation didn't match our records!"})
+      }
+    }
+  })
+}
+
 module.exports = {
   addMeal,
   deleteMeal,
   getMyMeals,
-  getOpenMeals
+  getOpenMeals,
+  reserveSeats,
+  unreserveSeats
 }

@@ -33,10 +33,14 @@ router.post("/getOpenMeals", (req, res, next) => {
 Takes in a meal_id: string, seatsNumber: integer
 */
 router.post("/reserveSeats", (req, res, next) => {
-  var seatsNumber = req.seatsNumber;
-  var username = req.root.username;
   var mealID = req.body.mealID;
+  var username = req.root.username;
+  var seatsNumber = req.seatsNumber;
+  mealsLogic.reserveSeats(mealID, username, seatsNumnber, (obj) => res.json(obj))
+})
 
+router.post("/unreserveSeats", (req,res, next) => {
+  
 })
 
 

@@ -27,11 +27,7 @@ const startMongo = () => {
 	}, promiseOptions).then(mongoClient => {
 		database = mongoClient.db(DATABASE_NAME)
 		started = true;
-<<<<<<< HEAD
-		console.log('mongoloaded')
-=======
 		console.log("Mongo connected")
->>>>>>> Reformatting the server code and file structure
 	})
 }
 

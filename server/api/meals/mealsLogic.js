@@ -48,7 +48,8 @@ const addMeal = (username, meal, next) => {
   } else {
     database.collection(MEALS).insertOne(meal, (err, result) => {
       if(err) {
-        next({success: false, data: "Meal couldn't be added"})
+        console.log(err)
+        next({success: false, data: "Meal couldn't be added - a database error occurred"})
       }
       else {
         next({success: true, data: "Meal uploaded successfully!", mealID: result.insertedId })
@@ -60,9 +61,10 @@ const addMeal = (username, meal, next) => {
 const deleteMeal = (username, mealID, next) => {
   database.collection(MEALS).removeOne({_id: ObjectID(mealID), host: username}, (err, result) => {
     if(err) {
+      console.log(err)
       next({success: false, data: "Meal couldn't be deleted - a database error occurred"})
     } else if (result.deletedCount <= 0){
-      next({success: false, data: "Meal couldn't be deleted"})
+      next({success: false, data: "Meal couldn't be deleted - deletedCount = 0 "})
     } else {
       next({success: true, data: "Meal deleted successfully!"})
     }
@@ -71,8 +73,9 @@ const deleteMeal = (username, mealID, next) => {
 
 const getMyMeals = (username, next) => {
   database.collection(MEALS).find({host: username}, (err, result) => {
-    if(err || result.deletedCount <= 0) {
-      next({success: false, data: "Meal couldn't be added"})
+    if(err) {
+      console.log(err)
+      next({success: false, data: "Meal couldn't be retrieved - a database error occurred"})
     } else {
       next({success: true, data: results})
     }
@@ -82,7 +85,8 @@ const getMyMeals = (username, next) => {
 const getOpenMeals = (next) => {
   database.collection(MEALS).find({open_seats: {$gt: 0}}, (err, result) => {
     if(err) {
-      next({success: false, data: "Meal couldn't be added"})
+      console.log(err)
+      next({success: false, data: "Meals couldn't be retrieved - a database error occurred"})
     } else {
       next({success: true, data: results})
     }
@@ -92,7 +96,7 @@ const getOpenMeals = (next) => {
 const reserveSeats = (mealID, reserver, seatsNumber, next) => {
   database.collection(MEALS).findOne({_id: ObjectID(mealID)}, (err, result) => {
     if(err) {
-      next({success: false, data: "Meal couldn't be found"})
+      next({success: false, data: "Meal to reserve couldn't be found - a database error occurred"})
     } else {
       if(result.open_seats >= seatsNumber) {
         var updatedMeal = Object.assign(result,
@@ -117,7 +121,8 @@ const reserveSeats = (mealID, reserver, seatsNumber, next) => {
 const unreserveSeats = (mealID, reserver, seatsNumber, next) => {
   database.collection(MEALS).findOne({_id: ObjectID(mealID)}, (err, result) => {
     if(err) {
-      next({success: false, data: "Meal couldn't be found"})
+      console.log(err)
+      next({success: false, data: "Meal to reserve couldn't be found - a database error occurred"})
     } else {
       if(diners.includes({diner:reserver, seatsReserved: seatsNumber})) {
         var updatedMeal = Object.assign(result,
@@ -127,7 +132,8 @@ const unreserveSeats = (mealID, reserver, seatsNumber, next) => {
           })
         database.collection(MEALS).updateOne({_id: ObjectID(meal_id)}, {updatedMeal}, (err, result) => {
           if(err) {
-            next({success: false, data: "Couldn't update with your request"})
+            console.log(err)
+            next({success: false, data: "Couldn't update with your request - a database error occurred"})
           } else {
             reservationLogic.deleteReservation(mealID, reserver, seatsNumber, next)
           }

@@ -2,7 +2,6 @@ import React from 'react';
 import { Card, Button } from "react-native-elements";
 import { onSignOut, getSessionID, getUserEmail } from "../auth";
 
-
 import {
   Image,
   Platform,

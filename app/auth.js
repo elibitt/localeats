@@ -1,4 +1,5 @@
 import { AsyncStorage } from "react-native";
+import { API_URL } from './constants/apiSource';
 
 export const USER_KEY = "auth-session-id";
 export const USER_EMAIL = "current-user-email";
@@ -23,7 +24,7 @@ export const onSignOut = async (id) => {
     console.log("Error removing sessionID from async storage");
   }
   //send to API
-	fetch('http://localeats.westus.cloudapp.azure.com/api/signin/logout', {
+	fetch(API_URL+'/api/signin/logout', {
 	  method: 'POST',
 	  headers: {
 	    'Content-Type': 'application/json',
@@ -33,7 +34,8 @@ export const onSignOut = async (id) => {
 	  })
 	}).then(res => res.json())
 	.catch(err => {
-		console.error('Error:', err);
+		//console.error('Error:', err);
+    Alert.alert("Error! Couldn't connect to server.");
 	});
 };
 

@@ -113,7 +113,7 @@ describe('MEALS', () => {
                   done()
                 } else {
                   res.body.should.have.property('success', false)
-                  res.body.should.have.property('data', "Meal couldn't be deleted")
+                  res.body.should.have.property('data', "Meal couldn't be deleted - deletedCount = 0 ")
                   done()
                 }
             })

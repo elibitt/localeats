@@ -33,7 +33,6 @@ const badMealObject2 = {
   address: "123 Test Road, Pittsburgh Pennsylvania, 17356",
   description: "Grilled Chicken"
 }
-var mealID
 
 before(done => {
   mongoSetup.getDatabase(
@@ -81,16 +80,18 @@ describe('MEALS', () => {
                 res.body.should.have.property('success', true)
                 res.body.should.have.property('mealID')
                 res.body.should.have.property('data', "Meal uploaded successfully!")
-                mealID = res.body.mealID
+                var mealID = res.body.mealID
+                console.log("TEST", mealID)
                 chai.request(app)
                     .post('/api/meals/deleteMeal')
                     .set('content-type', 'application/json')
-                    .send(JSON.stringify({sessionID: test_session_id, mealID: res.body.mealID}))
+                    .send(JSON.stringify({sessionID: test_session_id, mealID: mealID}))
                     .end((err, res, body) => {
                       if(err) {
                         assert(false)
                         done()
                       } else {
+                        console.log(res.body)
                         res.body.should.have.property('success', true)
                         res.body.should.have.property('data', "Meal deleted successfully!")
                         done()
@@ -112,7 +113,7 @@ describe('MEALS', () => {
                   done()
                 } else {
                   res.body.should.have.property('success', false)
-                  res.body.should.have.property('data', "Meal couldn't be deleted")
+                  res.body.should.have.property('data', "Meal couldn't be deleted - deletedCount = 0 ")
                   done()
                 }
             })

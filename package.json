@@ -5,6 +5,8 @@
   "main": "app.js",
   "scripts": {
     "test": "mocha server/__tests__/* --exit --timeout 20000",
+    "test_signin": "mocha server/__tests__/signinTests.js --exit --timeout 20000",
+    "test_meals": "mocha server/__tests__/mealTests.js --exit --timeout 20000",
     "start": "node server/app.js",
     "dock": "docker-compose up --build"
   },

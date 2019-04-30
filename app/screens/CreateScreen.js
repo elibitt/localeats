@@ -21,6 +21,7 @@ import {
   Icon,
   Button,
   ListItem,
+  ButtonGroup,
   Avatar,
   Slider,
   Input,
@@ -29,6 +30,8 @@ import { getSessionID, getUserEmail } from "../auth";
 import KeyboardAwareScrollView from "../components/keyboardAware/KeyboardAwareScrollView";
 import { API_URL } from '../constants/apiSource';
 import ImgUpload from '../components/imageUpload';
+import DatePicker from 'react-native-datepicker';
+import GooglePlacesInput from '../components/addressInput';
 
 
 const SCREEN_WIDTH = Dimensions.get('window').width;
@@ -45,20 +48,26 @@ export default class CreateScreen extends React.Component {
       mealSeats: 2,
       mealName: '',
       mealDesc: '',
-      mealAddress: '',
       isMealDescValid: true,
       isMealNameValid: true,
       isMealAddressValid: true,
+      isMealTimeValid: true,
+      priceIndex: 0,
+      mealPrice: '',
       isLoading: false,
       formVisible: 'none',
       introVisible: '',
       imgURL: '',
+      datetime: '',
+      displayAddress: '',
+      coordinatesObj: {"lat": '', "lng": ''},
     }
     this.submitMeal = this.submitMeal.bind(this);
     this.showForm = this.showForm.bind(this);
     this.hideForm = this.hideForm.bind(this);
     this.saveImage = this.saveImage.bind(this);
-
+    this.saveAddress = this.saveAddress.bind(this);
+    this.updateIndex = this.updateIndex.bind(this)
 
     getSessionID().then((id)=>{
       this.setState({sessionID: id});
@@ -70,8 +79,19 @@ export default class CreateScreen extends React.Component {
   }
   static navigationOptions = {title: 'Create New Meal',};
 
+  updateIndex (selectedIndex) {
+    this.setState({priceIndex: selectedIndex});
+    if (selectedIndex == 0){
+      this.setState({mealPrice: ''});
+    }
+  }
+
   saveImage(imgsrc) {
     this.setState({ imgURL: imgsrc });
+  }
+
+  saveAddress(displayAddy, coordinates) {
+    this.setState({ displayAddress: displayAddy, coordinatesObj: coordinates });
   }
 
   showForm() {
@@ -82,7 +102,10 @@ export default class CreateScreen extends React.Component {
       formVisible: 'none', 
       introVisible: '',
       mealName: '',
-      mealDesc: ''
+      mealDesc: '',
+      mealPrice: '',
+      datetime: '',
+      priceIndex: 0,
        });
   }
 
@@ -92,26 +115,33 @@ export default class CreateScreen extends React.Component {
             mealSeats,
             mealName,
             mealDesc,
-            mealAddress,
             isMealDescValid,
             isMealNameValid,
             isMealAddressValid,
-            imgURL } = this.state;
+            imgURL,
+            datetime,
+            mealPrice,
+            displayAddress,
+            coordinatesObj } = this.state;
     this.setState({ isLoading: true }); //set spinner
 
     LayoutAnimation.easeInEaseOut();
     this.setState({
       isMealNameValid: mealName.length > 1,
       isMealDescValid: mealDesc.length > 1,
-      isMealAddressValid: mealAddress.length > 1
+      isMealAddressValid: displayAddress.length > 1,
+      isMealTimeValid: datetime.length > 1
     }, () => {
-      if (mealName.length > 1 && mealDesc.length > 1 && mealAddress.length > 1){
+      if (mealName.length > 1 && datetime.length > 1 && mealDesc.length > 1 && displayAddress.length > 1){
         //create Meal object
         const mealObject = {
           seats: mealSeats,
-          address: mealAddress,
+          address: displayAddress,
+          coordinates: coordinatesObj,
           name: mealName,
           description: mealDesc,
+          datetime: datetime,
+          price: mealPrice > 0 ? parseInt(mealPrice) : 0,
           image: imgURL
         }
         //send to API
@@ -127,6 +157,8 @@ export default class CreateScreen extends React.Component {
         }).then(res => res.json())
         .then(response => {
           console.log(response);
+          Alert.alert("Meal was uploaded successfully!");
+          this.hideForm();
           this.setState({ isLoading: false });
         })
         .catch(err => {
@@ -134,8 +166,7 @@ export default class CreateScreen extends React.Component {
           Alert.alert("Error! Couldn't connect to server.");
           this.setState({ isLoading: false });
         });
-        Alert.alert("Meal was uploaded successfully!")
-        this.hideForm();
+        
       }
       else{
         this.setState({ isLoading: false })
@@ -144,22 +175,44 @@ export default class CreateScreen extends React.Component {
     });
   }
 
+  priceOption() {
+    return(
+      <Input inputStyle={{ marginLeft: 10 }}
+              placeholder={'$'+mealPrice} 
+              keyboardAppearance={"light"}
+              returnKeyType={'submit'}
+              blurOnSubmit={true}
+              value={mealPrice}
+              ref={input => {(this.mealPriceInput = input);}}
+              onSubmitEditing={() => this.submitMeal}
+              onChangeText={mealName => this.setState({ mealPrice })}
+              containerStyle={{
+                marginTop: 16,
+                borderBottomColor: 'rgba(0, 0, 0, 0.38)',
+              }}
+              />
+      )
+  }
+
   render() {
     const {
       isLoading,
       mealSeats,
       mealName,
       mealDesc,
-      mealAddress,
       isMealAddressValid,
       isMealDescValid,
       isMealNameValid,
       formVisible,
       introVisible,
+      priceIndex,
+      mealPrice,
     } = this.state;
+    const priceButtons = ["I'll keep it free", "I'd like to charge"];
+
     return (
       <KeyboardAvoidingView behavior="position" keyboardVerticalOffset={80} style={styles.container}>
-      <ScrollView>
+      <ScrollView keyboardShouldPersistTaps="handled">
         <View>
 
         <Image source={HERO_IMAGE} style={{ width: SCREEN_WIDTH, height: 200 }}/>
@@ -185,7 +238,7 @@ export default class CreateScreen extends React.Component {
         <Card>
             <ImgUpload saveImage={this.saveImage}/>
           </Card>
-          <Card>
+          <Card title="Tell us about your meal!">
             <Input inputStyle={{ marginLeft: 10 }}
                     placeholder={"What's on the menu?"} 
                     keyboardAppearance="light"
@@ -204,66 +257,107 @@ export default class CreateScreen extends React.Component {
                       marginTop: 16,
                       borderBottomColor: 'rgba(0, 0, 0, 0.38)',
                     }}/>
-              <Input inputStyle={{ marginLeft: 10, height: 120,  }}
-                    placeholder={'Add some more detail here...'}
-                    multiline={true}
-                    keyboardAppearance="light"
-                    returnKeyType='next'
-                    blurOnSubmit={true}
-                    value={mealDesc}
-                    ref={input => {(this.mealDescInput = input);}}
-                    onSubmitEditing={() => this.mealAddressInput.focus()}
-                    onChangeText={mealDesc => this.setState({ mealDesc })}
-                    errorMessage={
-                      isMealDescValid
-                        ? null
-                        : 'Please enter a description'
-                    }
-                    inputContainerStyle={{borderBottomColor:'rgba(0, 0, 0, 0)'}}
-                    containerStyle={{
-                      marginTop: 16,
-                      borderWidth: 1,
-                      borderColor: '#ddd',
-                    }}/>
-              </Card>
-              <Card>
-              <Text h3 style={{ alignSelf: "center", marginTop:25, color: '#222' }}>Seats Available: {this.state.mealSeats}</Text>
-              <View style={{ flex: 1, alignItems: 'stretch', justifyContent: 'center', marginBottom: 10 }}>
-                <Slider
-                  value={mealSeats}
-                  onValueChange={mealSeats => this.setState({ mealSeats })}
-                  minimumValue={1}
-                  maximumValue={12}
-                  step={1}
-                  animateTransitions={true}
-                  animationType='spring'
-                  thumbTintColor='#03A9F4'
-                />
-              </View>
-              <Input inputStyle={{ marginLeft: 10 }}
-                    placeholder={"Enter your address"} 
-                    keyboardAppearance="light"
-                    returnKeyType='done'
-                    blurOnSubmit={true}
-                    value={mealAddress}
-                    ref={input => {(this.mealAddressInput = input);}}
-                    onChangeText={mealAddress => this.setState({ mealAddress })}
-                    errorMessage={
-                      isMealAddressValid
-                        ? null
-                        : 'Please enter an address'
-                    }
-                    containerStyle={{
-                      marginTop: 16,
-                      borderBottomColor: 'rgba(0, 0, 0, 0.38)',
-                    }}/>
-            
+            <Input inputStyle={{ marginLeft: 10, height: 120,  }}
+                  placeholder={'Add some more detail here...'}
+                  multiline={true}
+                  keyboardAppearance="light"
+                  returnKeyType='done'
+                  blurOnSubmit={true}
+                  value={mealDesc}
+                  ref={input => {(this.mealDescInput = input);}}
+                  //onSubmitEditing={() => this.mealAddressInput.focus()}
+                  onChangeText={mealDesc => this.setState({ mealDesc })}
+                  errorMessage={
+                    isMealDescValid
+                      ? null
+                      : 'Please enter a description'
+                  }
+                  inputContainerStyle={{borderBottomColor:'rgba(0, 0, 0, 0)'}}
+                  containerStyle={{
+                    marginTop: 16,
+                    borderWidth: 1,
+                    borderColor: '#ddd',
+                  }}/>
           </Card>
+          <Card title="How many people can you host?">
+            <Text h3 style={{ alignSelf: "center", marginTop:25, color: '#222' }}>{this.state.mealSeats}</Text>
+            <View style={{ flex: 1, alignItems: 'stretch', justifyContent: 'center', marginBottom: 10 }}>
+              <Slider
+                value={mealSeats}
+                onValueChange={mealSeats => this.setState({ mealSeats })}
+                minimumValue={1}
+                maximumValue={12}
+                step={1}
+                animateTransitions={true}
+                animationType='spring'
+                thumbTintColor='#03A9F4'
+              />
+            </View>
+          </Card>
+          <Card title="Where are you located?" >
+
+          <GooglePlacesInput saveAddress={this.saveAddress}/>
+
+          <Text style={{color:"red"}}>{this.state.isMealAddressValid ? "" : "Please enter an address"}</Text>
+
+          </Card>
+          <Card title="When should your guests arrive?">
+            <DatePicker
+            style={{width: '90%', alignSelf: "center"}}
+            placeholder={"Select a date & time"}
+            date={this.state.datetime}
+            mode="datetime"
+            format="MM-DD-YYYY HH:mm"
+            confirmBtnText="Confirm"
+            cancelBtnText="Cancel"
+            customStyles={{
+              dateIcon: {
+                position: 'absolute',
+                left: 8,
+                top: 4,
+                marginLeft: 0
+
+              },
+              dateText: {
+                fontSize: 18
+              }
+            }}
+            minuteInterval={15}
+            onDateChange={(datetime) => {this.setState({datetime: datetime});}}
+          />
+          <Text style={{color:"red"}}>{this.state.isMealTimeValid ? "" : "Please enter date & time"}</Text>
+
+        </Card>
+        <Card title="Would you like to charge for your meal?">
+          <ButtonGroup
+            onPress={this.updateIndex}
+            selectedIndex={priceIndex}
+            buttons={priceButtons}
+            containerStyle={{height: 40, borderRadius:10}}
+          />
+          <Input inputStyle={{ marginLeft: 10 }}
+              placeholder={'Enter price per person'} 
+              keyboardAppearance={"light"}
+              leftIcon={{ type: 'font-awesome', name: 'usd' }}
+              keyboardType="numeric"
+              returnKeyType={'done'}
+              blurOnSubmit={true}
+              value={mealPrice}
+              ref={input => {(this.mealPriceInput = input);}}
+              onChangeText={mealPrice => this.setState({ mealPrice })}
+              containerStyle={{
+                marginTop: 16,
+                borderBottomColor: 'rgba(0, 0, 0, 0.38)',
+                display: priceIndex > 0 ? 'flex':'none'
+              }}
+              />
+        </Card>
           <View style={{alignItems:"center", marginBottom: 25}}>
           <Button
             buttonStyle={styles.submitButton}
             containerStyle={{ marginTop: 32, flex: 0 }}
             activeOpacity={0.8}
+            placeholder={"Select the date & time of your meal"}
             title='CREATE MEAL'
             onPress={this.submitMeal}
             titleStyle={styles.submitTextButton}

@@ -129,7 +129,7 @@ export default class ImgUpload extends Component {
     if (cameraPerm === 'granted' && cameraRollPerm === 'granted') {
       let pickerResult = await ImagePicker.launchCameraAsync({
         allowsEditing: true,
-        aspect: [4, 3],
+        aspect: [16, 9],
       });
 
       this._handleImagePicked(pickerResult);
@@ -145,7 +145,7 @@ export default class ImgUpload extends Component {
     if (cameraRollPerm === 'granted') {
       let pickerResult = await ImagePicker.launchImageLibraryAsync({
         allowsEditing: true,
-        aspect: [4, 3],
+        aspect: [16, 9],
       });
 
       this._handleImagePicked(pickerResult);

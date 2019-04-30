@@ -45,7 +45,9 @@ describe('USERS', () => {
           })
       });
 
-    it('register_new_name', (done) => {
+    // this is also to test that the session_id we get back form the
+    // register function works
+    it('register_new_name_then_get_username', (done) => {
       chai.request(app)
           .post('/api/signin/register')
           .set('content-type', 'application/json')
@@ -55,10 +57,23 @@ describe('USERS', () => {
               assert(false)
               done()
             } else {
-              console.log(res.body)
               res.body.should.have.property('success', true)
               res.body.should.have.property('sessionID');
-              done()
+              var sessionID = res.body.sessionID
+              chai.request(app)
+                  .post('/api/signin/getUsername')
+                  .set('content-type', 'application/json')
+                  .send(JSON.stringify({sessionID: sessionID}))
+                  .end((err, res, body) => {
+                    if(err) {
+                      assert(false)
+                      done()
+                    } else {
+                      res.body.should.have.property('success', true)
+                      res.body.should.have.property('data', genName)
+                      done()
+                    }
+                })
             }
           })
       });

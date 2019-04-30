@@ -5,6 +5,8 @@
   "main": "app.js",
   "scripts": {
     "test": "mocha server/__tests__/* --exit --timeout 20000",
+    "test_signin": "mocha server/__tests__/signinTests.js --exit --timeout 20000",
+    "test_meals": "mocha server/__tests__/mealTests.js --exit --timeout 20000",
     "start": "node server/app.js",
     "dock": "docker-compose up --build"
   },
@@ -41,6 +43,7 @@
     "promise-retry": "^1.1.1",
     "react": "^16.8.3",
     "react-native": "^0.59.3",
+    "react-native-actionsheet": "^2.4.2",
     "uuid": "^3.3.2"
   }
 }

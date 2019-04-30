@@ -101,6 +101,7 @@ describe('USERS', () => {
           .send(JSON.stringify({username: TEST_NAME, password: 'wrong_pass'}))
           .end((err, res, body) => {
             if(err) {
+              assert(false)
               done()
             } else {
               res.body.should.have.property('success', false)
@@ -117,6 +118,7 @@ describe('USERS', () => {
           .end((err, res, body) => {
             if(err) {
               done()
+              assert(false)
             } else {
               res.body.should.have.property('success', true)
               res.body.should.have.property('sessionID')
@@ -124,6 +126,22 @@ describe('USERS', () => {
             }
           })
       });
+      it('bad_session_id', (done) => {
+        chai.request(app)
+            .post('/api/signin/getUsername')
+            .set('content-type', 'application/json')
+          .send(JSON.stringify({sessionID: uuid()}))
+            .end((err, res, body) => {
+              if(err) {
+                assert(false)
+                done()
+              } else {
+                res.body.should.have.property('success', false)
+                res.body.should.have.property('data', "Your sessionID could not be verified, please login")
+                done()
+              }
+            })
+        });
 })
 
 after(done => {

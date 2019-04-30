@@ -83,7 +83,7 @@ const getMyMeals = (username, next) => {
 }
 
 const getOpenMeals = (next) => {
-  database.collection(MEALS).find({openSeats: {$gt: 0}}, (err, result) => {
+  database.collection(MEALS).find({openSeats: {$gt: 0}}).toArray((err, result) => {
     if(err) {
       console.log(err)
       next({success: false, data: "Meals couldn't be retrieved - a database error occurred"})

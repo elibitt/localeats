@@ -57,7 +57,6 @@ describe('USERS', () => {
               assert(false)
               done()
             } else {
-              console.log(res.body)
               res.body.should.have.property('success', true)
               res.body.should.have.property('sessionID');
               var sessionID = res.body.sessionID
@@ -70,7 +69,6 @@ describe('USERS', () => {
                       assert(false)
                       done()
                     } else {
-                      console.log(res.body)
                       res.body.should.have.property('success', true)
                       res.body.should.have.property('data', genName)
                       done()

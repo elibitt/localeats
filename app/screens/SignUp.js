@@ -13,6 +13,7 @@ import {
   Keyboard,
   TouchableWithoutFeedback,
 } from 'react-native';import { Card, Button, Input, Icon } from 'react-native-elements';
+import { API_URL } from '../constants/apiSource';
 
 import { onSignIn } from "../auth";
 
@@ -78,7 +79,7 @@ export default class SignUp extends Component{
     	if (this.state.isEmailValid && this.state.isPasswordValid 
     	&& this.state.isConfirmationValid){
 	    	//send to API
-		    fetch('http://localeats.westus.cloudapp.azure.com/api/signin/register', {
+		    fetch(API_URL+'/api/signin/register', {
 		      method: 'POST',
 		      headers: {
 		        'Content-Type': 'application/json',
@@ -90,8 +91,9 @@ export default class SignUp extends Component{
 		    }).then(res => res.json())
 		    .then(response => this.handleAPIRes(response))
 		    .catch(error => {
-		    	console.error('Error!:', error);
-		    	Alert.alert(error);
+		    	//console.error('Error:', err);
+          Alert.alert("Error! Couldn't connect to server.");
+          this.setState({ isLoading: false });
 		    });
     	}
     	else{

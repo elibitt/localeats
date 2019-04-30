@@ -43,6 +43,7 @@
     "promise-retry": "^1.1.1",
     "react": "^16.8.3",
     "react-native": "^0.59.3",
+    "react-native-actionsheet": "^2.4.2",
     "uuid": "^3.3.2"
   }
 }

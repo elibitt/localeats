@@ -21,6 +21,7 @@ import {
   Icon,
   Button,
   ListItem,
+  Rating,
   ButtonGroup,
   Avatar,
   Slider,
@@ -61,6 +62,9 @@ export default class CreateScreen extends React.Component {
       datetime: '',
       displayAddress: '',
       coordinatesObj: {"lat": '', "lng": ''},
+      cookName: '',
+      cookPicture: '',
+      cookRating: 0,
     }
     this.submitMeal = this.submitMeal.bind(this);
     this.showForm = this.showForm.bind(this);
@@ -122,7 +126,10 @@ export default class CreateScreen extends React.Component {
             datetime,
             mealPrice,
             displayAddress,
-            coordinatesObj } = this.state;
+            coordinatesObj,
+            cookName,
+            cookPicture,
+            cookRating } = this.state;
     this.setState({ isLoading: true }); //set spinner
 
     LayoutAnimation.easeInEaseOut();
@@ -142,7 +149,10 @@ export default class CreateScreen extends React.Component {
           description: mealDesc,
           datetime: datetime,
           price: mealPrice > 0 ? parseInt(mealPrice) : 0,
-          image: imgURL
+          image: imgURL,
+          cookName: cookName,
+          cookPicture: cookPicture,
+          cookRating: cookRating
         }
         //send to API
         fetch(API_URL+'/api/meals/addMeal', {
@@ -207,6 +217,9 @@ export default class CreateScreen extends React.Component {
       introVisible,
       priceIndex,
       mealPrice,
+      cookName,
+      cookPicture,
+      cookRating
     } = this.state;
     const priceButtons = ["I'll keep it free", "I'd like to charge"];
 
@@ -351,6 +364,40 @@ export default class CreateScreen extends React.Component {
                 display: priceIndex > 0 ? 'flex':'none'
               }}
               />
+        </Card>
+        <Card title="Last thing...">
+          <Input inputStyle={{ marginLeft: 10 }}
+              placeholder={'Enter your name'} 
+              keyboardAppearance={"light"}
+              blurOnSubmit={true}
+              value={cookName}
+              ref={input => {(this.cookNameInput = input);}}
+              onChangeText={cookName => this.setState({ cookName })}
+              containerStyle={{
+                marginTop: 16,
+                borderBottomColor: 'rgba(0, 0, 0, 0.38)',
+              }}
+              />
+          <Input inputStyle={{ marginLeft: 10 }}
+              placeholder={'Enter your picture URL'} 
+              keyboardAppearance={"light"}
+              blurOnSubmit={true}
+              value={cookPicture}
+              ref={input => {(this.cookPictureInput = input);}}
+              onChangeText={cookPicture => this.setState({ cookPicture })}
+              containerStyle={{
+                marginTop: 16,
+                borderBottomColor: 'rgba(0, 0, 0, 0.38)',
+              }}
+              />
+          <Rating
+            imageSize={40}
+            startingValue={cookRating}
+            onFinishRating={(rating)=>{this.setState({cookRating: rating})}}
+            style={{marginTop:20}}
+            showRating
+            fractions={1}
+          />
         </Card>
           <View style={{alignItems:"center", marginBottom: 25}}>
           <Button

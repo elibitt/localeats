@@ -88,7 +88,7 @@ const getOpenMeals = (next) => {
       console.log(err)
       next({success: false, data: "Meals couldn't be retrieved - a database error occurred"})
     } else {
-      next({success: true, data: results})
+      next({success: true, data: result})
     }
   })
 }

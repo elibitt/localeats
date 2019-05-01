@@ -6,9 +6,11 @@ import TabBarIcon from '../components/TabBarIcon';
 import HomeScreen from '../screens/HomeScreen';
 import CreateScreen from '../screens/CreateScreen';
 import ProfileScreen from '../screens/ProfileScreen';
+import MealScreen from '../screens/MealScreen';
 
 const HomeStack = createStackNavigator({
 	Home: HomeScreen,
+	Meal: MealScreen,
 });
 
 HomeStack.navigationOptions = {

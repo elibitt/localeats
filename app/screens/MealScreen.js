@@ -91,7 +91,7 @@ export default class HomeScreen extends React.Component {
                 <Avatar
                   rounded
                   size="medium"
-                  title={mealObj.cookName[0]}
+                  title={mealObj.cookName.charAt(0)}
                   source={ mealObj.cookPicture == "" ? {} : {uri:mealObj.cookPicture} }
                 />
                 <View style={{marginLeft:10, overflow:'none', alignItems:'flex-start'}}>

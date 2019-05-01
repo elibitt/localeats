@@ -6,6 +6,7 @@ import {
   TouchableOpacity,
   Alert,
   ActivityIndicator,
+  RefreshControl,
   TouchableHighlight,
   View,
 } from 'react-native';
@@ -34,6 +35,8 @@ export default class HomeScreen extends React.Component {
       isLoading: true,
       sessionID: '',
       email: '',
+      mealArray: [],
+      refreshing: false,
     }
     
     this.renderMealCards = this.renderMealCards.bind(this);
@@ -55,7 +58,7 @@ export default class HomeScreen extends React.Component {
   };
 
   componentWillMount(){
-    this.setState({ isLoading: true});
+    this.setState({ refreshing: true});
 
     getUserEmail().then((addy)=>{
       this.setState({email: addy});
@@ -70,22 +73,52 @@ export default class HomeScreen extends React.Component {
             'Content-Type': 'application/json',
           },
           body: JSON.stringify({
-            //sessionID: this.state.sessionID,
+            sessionID: this.state.sessionID,
           })
         })
         .then(res => res.json())
         .then(response => {
-          console.log(response);
-          this.setState({ isLoading: false });
+          //console.log(response.data);
+          this.setState({ refreshing: false, mealArray: response.data });
+          //console.log(response.data[0]);
         })
         .catch(err => {
           //console.error('Error:', err);
           Alert.alert("Error! Couldn't connect to server.");
-          this.setState({ isLoading: true });
+          this.setState({ refreshing: false });
         });
       });
     });
   }
+
+  _onRefresh = () => {
+    this.setState({refreshing: true});
+    fetch(API_URL+'/api/meals/getOpenMeals', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            sessionID: this.state.sessionID,
+          })
+        })
+        .then(res => res.json())
+        .then(response => {
+          //console.log(response.data);
+          this.setState({ mealArray: response.data });
+          //console.log(response.data[0]);
+          setTimeout(() => {
+            console.log('Done Refreshing');
+            this.setState({ refreshing: false });
+          }, 500);
+        })
+        .catch(err => {
+          console.log('Error:', err);
+          Alert.alert("Error! Couldn't connect to server.");
+          this.setState({ refreshing: false });
+        });
+  }
+
   convertMonth(datetime){
     const monthNames = ["JAN", "FEB", "MAR", "APR", "MAY", "JUN",
       "JUL", "AUG", "SEP", "OCT", "NOV", "DEC"
@@ -108,16 +141,20 @@ export default class HomeScreen extends React.Component {
   }
 
   renderMealCards() {
-    const tempArray = [
-  { "seats" : 6, "address" : "151 N Craig St, Pittsburgh, PA 15213, USA", "coordinates" : { "lat" : 40.4490241, "lng" : -79.95060149999999 }, "name" : "Fluffy Pancakes!", "description" : "They’re my grandmother’s recipe, everyone loves them!", "datetime" : "05-12-2019 11:00", "price" : 0, "image" : "https://exponent-file-upload-example.s3.amazonaws.com/1556593554310.png", "cookName" : "Lysa Arryn", "cookPicture" : "https://www.hbo.com/content/dam/hbodata/series/game-of-thrones/character/s5/lysa-arryn-1920.jpg/_jcr_content/renditions/cq5dam.web.1200.675.jpeg", "cookRating" : 4.6,"host" : "test@test.co", "openSeats" : 6, "diners" : [ ] },
-  { "seats" : 12, "address" : "4548 Carroll St, Pittsburgh, PA 15224, USA", "coordinates" : { "lat" : 40.4652846, "lng" : -79.9507045 }, "name" : "Fresh Caught Seafood Burritos", "description" : "I’ve been making burritos since I was a little girl, I’d love to share them with you", "datetime" : "06-02-2019 17:00", "price" : 5, "image" : "https://exponent-file-upload-example.s3.amazonaws.com/1556593645790.png", "cookName" : "Davos Seaworth", "cookPicture" : "", "cookRating" : 4.9, "host" : "test@test.co", "openSeats" : 12, "diners" : [ ] },
-  { "seats" : 4, "address" : "5708 Walnut St, Pittsburgh, PA 15232, USA", "coordinates" : { "lat" : 40.452171, "lng" : -79.930131 }, "name" : "Hipster Avocado Toast", "description" : "Why did the hipster burn his tongue?... He started eating before it was cool.", "datetime" : "05-03-2019 14:00", "price" : 26, "image" : "https://exponent-file-upload-example.s3.amazonaws.com/1556593732202.png", "cookName" : "John Arryn", "cookPicture" : "https://s3.amazonaws.com/uifaces/faces/twitter/adhamdannaway/128.jpg", "cookRating" : 3.4, "host" : "test@test.co", "openSeats" : 4, "diners" : [ ] },
-  { "seats" : 3, "address" : "14th St & Smallman St, Pittsburgh, PA 15222, USA", "coordinates" : { "lat" : 40.4479676, "lng" : -79.99049749999999 }, "name" : "Homemade Sushi Rolls", "description" : "They’re so good, you’re going to love them!", "datetime" : "05-29-2019 17:30", "price" : 12, "image" : "https://exponent-file-upload-example.s3.amazonaws.com/1556647659937.png", "cookName" : "Sherri Melisandre", "cookPicture" : "https://s3.amazonaws.com/uifaces/faces/twitter/ladylexy/128.jpg", "cookRating" : 4.4, "host" : "test@test.co", "openSeats" : 3, "diners" : [ ] }
-]
+    if (this.state.mealArray.length < 1){
+      return(
+        <Card 
+          featuredTitle="No meals to display" 
+          image={require('../assets/images/food/meal-placeholder.png')}>
+          <Text style={{alignSelf:'center', fontSize:16}}>Check back later!</Text>
+        </Card>
+        
+        )
+    }
     return (
-      tempArray.map((c, i) => {
+      this.state.mealArray.map((c, i) => {
         return [
-        <TouchableOpacity key={i} onPress={() => this.onPressed(tempArray[i])} >
+        <TouchableOpacity key={i} onPress={() => this.onPressed(this.state.mealArray[i])} >
           <Card
             image={{ uri: c.image }}
             featuredTitle={c.price > 0 ? "$"+c.price.toString() : "FREE"}
@@ -136,7 +173,7 @@ export default class HomeScreen extends React.Component {
                 <Avatar
                   rounded
                   size="medium"
-                  title={c.cookName[0]}
+                  title={c.cookName.charAt(0)}
                   source={ c.cookPicture == "" ? {} : {uri:c.cookPicture} }
                 />
                 <View style={{marginLeft:10, overflow:'none', alignItems:'flex-start'}}>
@@ -186,18 +223,16 @@ export default class HomeScreen extends React.Component {
   render() {
     return (
       <View style={styles.container}>
-        <ActivityIndicator size="large" color="#ddd" animating={this.state.isLoading}
-          style={{
-              position: 'absolute',
-              left: 0,
-              right: 0,
-              top: 0,
-              bottom: 0,
-              alignItems: 'center',
-              justifyContent: 'center',
-              backgroundColor: '#888'
-              }}/>
-        <ScrollView style={styles.container} contentContainerStyle={styles.contentContainer}>
+        <ScrollView 
+          refreshControl={
+            <RefreshControl
+              refreshing={this.state.refreshing}
+              onRefresh={this._onRefresh}
+            />
+          }
+          style={styles.container}
+          contentContainerStyle={styles.contentContainer}
+        >
           <View style={styles.welcomeContainer}>
             <Image
               source={require('../assets/images/logov1.png')}

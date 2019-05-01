@@ -210,23 +210,49 @@ describe('MEALS', () => {
                 })
             });
 
-            it('test_get_meals', (done) => {
-                chai.request(app)
-                    .post('/api/meals/getMyMeals')
-                    .set('content-type', 'application/json')
-                    .send(JSON.stringify({sessionID: test_session_id}))
-                    .end((err, res, body) => {
-                      if(err) {
-                        assert(false)
-                        done()
-                      } else {
-                        res.body.should.have.property('success', true)
-                        res.body.should.have.property('data')
-                        done()
+          it('test_get_my_meals', (done) => {
+              chai.request(app)
+                  .post('/api/meals/getMyMeals')
+                  .set('content-type', 'application/json')
+                  .send(JSON.stringify({sessionID: test_session_id}))
+                  .end((err, res, body) => {
+                    if(err) {
+                      assert(false)
+                      done()
+                    } else {
+                      res.body.should.have.property('success', true)
+                      res.body.should.have.property('data')
+                      res.body.data.should.be.an('array')
+                      for(var i = 0; i < res.body.data.length; i++) {
+                        var meal = res.body.data[i]
+                        meal.should.have.property('host', TEST_NAME)
                       }
-                  })
-              });
+                      done()
+                    }
+                })
+            });
 
+          it('test_get_open_meals', (done) => {
+              chai.request(app)
+                  .post('/api/meals/getMyMeals')
+                  .set('content-type', 'application/json')
+                  .send(JSON.stringify({sessionID: test_session_id}))
+                  .end((err, res, body) => {
+                    if(err) {
+                      assert(false)
+                      done()
+                    } else {
+                      res.body.should.have.property('success', true)
+                      res.body.should.have.property('data')
+                      res.body.data.should.be.an('array')
+                      for(var i = 0; i < res.body.data.length; i++) {
+                        var meal = res.body.data[i]
+                        meal.should.have.property('openSeats').that.is.above(0)
+                      }
+                      done()
+                    }
+                })
+            });
 })
 
 after(done => {

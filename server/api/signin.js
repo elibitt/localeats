@@ -21,7 +21,10 @@ const isLoggedInMiddleware = (req, res, next) => {
         if(err) {
           res.json({success: false, data: "An error occurred"})
         }
-        else {
+        else if(result == null) {
+          res.json({success: false, data: "Your sessionID could not be verified, please login"})
+        }
+        else{
           req.root = {username: result.username}
           next()
         }

@@ -28,7 +28,7 @@ const makeMealObject = (meal, hostName) => {
 const getMeals = (mealIDs, next) => {
     database.collection(MEALS).find({_id: {$in: mealIDs.map((id) => ObjectID(id))}}, (err, result) => {
       if(err) {
-        console.log("Couldn't get meal objects")
+        console.log(err)
         next({})
       } else {
         next(result)
@@ -72,18 +72,18 @@ const deleteMeal = (username, mealID, next) => {
 }
 
 const getMyMeals = (username, next) => {
-  database.collection(MEALS).find({host: username}, (err, result) => {
+  database.collection(MEALS).find({host: username}).toArray((err, result) => {
     if(err) {
       console.log(err)
       next({success: false, data: "Meal couldn't be retrieved - a database error occurred"})
     } else {
-      next({success: true, data: results})
+      next({success: true, data: result})
     }
   })
 }
 
 const getOpenMeals = (next) => {
-  database.collection(MEALS).find({open_seats: {$gt: 0}}, (err, result) => {
+  database.collection(MEALS).find({openSeats: {$gt: 0}}).toArray((err, result) => {
     if(err) {
       console.log(err)
       next({success: false, data: "Meals couldn't be retrieved - a database error occurred"})
@@ -98,10 +98,10 @@ const reserveSeats = (mealID, reserver, seatsNumber, next) => {
     if(err) {
       next({success: false, data: "Meal to reserve couldn't be found - a database error occurred"})
     } else {
-      if(result.open_seats >= seatsNumber) {
+      if(result.openSeats >= seatsNumber) {
         var updatedMeal = Object.assign(result,
           {
-            open_seats: result.open_seats - seatsNumber,
+            openSeats: result.openSeats - seatsNumber,
             diners: result.diners.concat([username, seatsNumber])
           })
         database.collection(MEALS).updateOne({_id: ObjectID(meal_id)}, {updatedMeal}, (err, result) => {
@@ -127,7 +127,7 @@ const unreserveSeats = (mealID, reserver, seatsNumber, next) => {
       if(diners.includes({diner:reserver, seatsReserved: seatsNumber})) {
         var updatedMeal = Object.assign(result,
           {
-            open_seats: result.open_seats + seatsNumber,
+            openSeats: result.openSeats + seatsNumber,
             diners: result.diners.filter(x => x.diner != reserver)
           })
         database.collection(MEALS).updateOne({_id: ObjectID(meal_id)}, {updatedMeal}, (err, result) => {

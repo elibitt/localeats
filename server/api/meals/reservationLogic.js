@@ -44,10 +44,10 @@ const getReservations = (reserver, next) => {
       else {
         mealsLogic.getMeals(result.map(x => x._id), (meals) => {
           mealsDict = {}
-          for (meal in meals) {
+          for (var meal in meals) {
               mealsDict[meal._id] = meal
           }
-          for (reservation in result) {
+          for (var reservation in result) {
             reservation["meal"] = mealsDict[result.mealID]
           }
           next({success: true, data: result})

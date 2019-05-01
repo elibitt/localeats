@@ -15,12 +15,38 @@ const MEALS = 'users'
 var TEST_NAME = 'testusername1'
 var TEST_PASS = 'testpasscode1'
 
-var test_session_id
+var TEST_NAME2 = 'testusername2'
+var TEST_PASS2 = 'testpasscode2'
 
-const mealObject = {
+var TEST_NAME3 = 'testusername3'
+var TEST_PASS3 = 'testpasscode3'
+
+var test_session_id
+var test_session_id2
+var test_session_id3
+
+const mealObject0 = {
   seats: 6,
   address: "123 Test Road, Pittsburgh Pennsylvania, 17356",
   description: "Grilled Chicken"
+}
+
+const mealObject1 = {
+  seats: 4,
+  address: "321 Java Road, Pittsburgh Pennsylvania, 17356",
+  description: "Pizza"
+}
+
+const mealObject2 = {
+  seats: 8,
+  address: "456 Unit Road, Pittsburgh Pennsylvania, 17356",
+  description: "Ice Cream"
+}
+
+const mealObject3 = {
+  seats: 10,
+  address: "789 Code Road, Pittsburgh Pennsylvania, 17356",
+  description: "French Fries"
 }
 
 const badMealObject1 = {
@@ -34,18 +60,52 @@ const badMealObject2 = {
   description: "Grilled Chicken"
 }
 
+const chaiSignIn = (app, username, password, next) => {
+  chai.request(app)
+      .post('/api/signin/login')
+      .set('content-type', 'application/json')
+      .send(JSON.stringify({username: username, password: password}))
+      .end((err, res, body) => {
+          next(res.body.sessionID)
+      })
+}
+
+const addChaiMeal = (app, meal, sessionID, next) => {
+  chai.request(app)
+      .post('/api/meals/addMeal')
+      .set('content-type', 'application/json')
+      .send(JSON.stringify({sessionID: sessionID, meal: meal}))
+      .end((err, res, body) => {
+        next()
+      })
+}
+
+const addChaiMealArray = (app, mealArray, sessionID, next) => {
+  if(mealArray && mealArray.length != 0) {
+    meal = mealArray.pop()
+    addChaiMeal(app, meal, sessionID, () => addChaiMealArray(app, mealArray, sessionID, next))
+  } else {
+    next()
+  }
+}
+
 before(done => {
   mongoSetup.getDatabase(
     (db) => {
-      chai.request(app)
-          .post('/api/signin/login')
-          .set('content-type', 'application/json')
-          .send(JSON.stringify({username: TEST_NAME, password: TEST_PASS}))
-          .end((err, res, body) => {
-              res.body.should.have.property('success', true)
-              test_session_id = res.body.sessionID
+      // populate the database with the test meals and then get a few login sessionIDs
+      chaiSignIn(app, TEST_NAME, TEST_PASS, (id) => {
+        test_session_id = id
+        addChaiMealArray(app, [mealObject1, mealObject2, mealObject3], id, () => {
+          chaiSignIn(app, TEST_NAME2, TEST_PASS2, (id2) => {
+            test_session_id2 = id2
+            chaiSignIn(app, TEST_NAME2, TEST_PASS3, (id3) => {
+              test_session_id3 = id3
               done()
-      })})
+            })
+          })
+        })
+      })
+    })
 })
 
 describe('MEALS', () => {
@@ -53,7 +113,7 @@ describe('MEALS', () => {
       chai.request(app)
           .post('/api/meals/addMeal')
           .set('content-type', 'application/json')
-          .send(JSON.stringify({sessionID: test_session_id, meal: mealObject}))
+          .send(JSON.stringify({sessionID: test_session_id, meal: mealObject0}))
           .end((err, res, body) => {
             if(err) {
               assert(false)
@@ -71,7 +131,7 @@ describe('MEALS', () => {
         chai.request(app)
             .post('/api/meals/addMeal')
             .set('content-type', 'application/json')
-            .send(JSON.stringify({sessionID: test_session_id, meal: mealObject}))
+            .send(JSON.stringify({sessionID: test_session_id, meal: mealObject0}))
             .end((err, res, body) => {
               if(err) {
                 assert(false)
@@ -81,7 +141,6 @@ describe('MEALS', () => {
                 res.body.should.have.property('mealID')
                 res.body.should.have.property('data', "Meal uploaded successfully!")
                 var mealID = res.body.mealID
-                console.log("TEST", mealID)
                 chai.request(app)
                     .post('/api/meals/deleteMeal')
                     .set('content-type', 'application/json')
@@ -91,7 +150,6 @@ describe('MEALS', () => {
                         assert(false)
                         done()
                       } else {
-                        console.log(res.body)
                         res.body.should.have.property('success', true)
                         res.body.should.have.property('data', "Meal deleted successfully!")
                         done()
@@ -152,6 +210,49 @@ describe('MEALS', () => {
                 })
             });
 
+          it('test_get_my_meals', (done) => {
+              chai.request(app)
+                  .post('/api/meals/getMyMeals')
+                  .set('content-type', 'application/json')
+                  .send(JSON.stringify({sessionID: test_session_id}))
+                  .end((err, res, body) => {
+                    if(err) {
+                      assert(false)
+                      done()
+                    } else {
+                      res.body.should.have.property('success', true)
+                      res.body.should.have.property('data')
+                      res.body.data.should.be.an('array')
+                      for(var i = 0; i < res.body.data.length; i++) {
+                        var meal = res.body.data[i]
+                        meal.should.have.property('host', TEST_NAME)
+                      }
+                      done()
+                    }
+                })
+            });
+
+          it('test_get_open_meals', (done) => {
+              chai.request(app)
+                  .post('/api/meals/getMyMeals')
+                  .set('content-type', 'application/json')
+                  .send(JSON.stringify({sessionID: test_session_id}))
+                  .end((err, res, body) => {
+                    if(err) {
+                      assert(false)
+                      done()
+                    } else {
+                      res.body.should.have.property('success', true)
+                      res.body.should.have.property('data')
+                      res.body.data.should.be.an('array')
+                      for(var i = 0; i < res.body.data.length; i++) {
+                        var meal = res.body.data[i]
+                        meal.should.have.property('openSeats').that.is.above(0)
+                      }
+                      done()
+                    }
+                })
+            });
 })
 
 after(done => {

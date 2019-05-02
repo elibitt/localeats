@@ -95,6 +95,7 @@ before(done => {
       // populate the database with the test meals and then get a few login sessionIDs
       chaiSignIn(app, TEST_NAME, TEST_PASS, (id) => {
         test_session_id = id
+        console.log("MEAL TEST", TEST_NAME, id)
         addChaiMealArray(app, [mealObject1, mealObject2, mealObject3], id, () => {
           chaiSignIn(app, TEST_NAME2, TEST_PASS2, (id2) => {
             test_session_id2 = id2

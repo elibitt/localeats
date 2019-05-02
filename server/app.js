@@ -5,9 +5,9 @@ const bodyparser = require('body-parser')
 
 const mongoSetup = require(path.resolve(__dirname + '/mongoSetup'))
 
-const mealsRouter = require(path.resolve(__dirname + '/api/meals/mealsEndpoints'))
-
 const { signInRouter, isLoggedInMiddleware } = require(path.resolve(__dirname + '/api/signin'))
+const mealsRouter = require(path.resolve(__dirname + '/api/meals/mealsEndpoints'))
+const userInfoRouter = require(path.resolve(__dirname + '/api/userInfoEndpoints'))
 
 console.log("the port is ", process.env.PORT)
 console.log("the mongo is ", process.env.MONGODB_URL)
@@ -24,6 +24,7 @@ mongoSetup.getDatabase((db) => {database = db});
 
 app.use(bodyparser.json())
 app.use("/api/signin", signInRouter)
+app.use("/api/user", isLoggedInMiddleware, userInfoRouter)
 app.use("/api/meals", isLoggedInMiddleware, mealsRouter)
 
 server = app.listen(port, () => console.log("listening on port: ", port))

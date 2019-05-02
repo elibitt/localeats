@@ -102,10 +102,11 @@ const reserveSeats = (mealID, reserver, seatsNumber, next) => {
         var updatedMeal = Object.assign(result,
           {
             openSeats: result.openSeats - seatsNumber,
-            diners: result.diners.concat([username, seatsNumber])
+            diners: result.diners.concat([reserver, seatsNumber])
           })
-        database.collection(MEALS).updateOne({_id: ObjectID(meal_id)}, {updatedMeal}, (err, result) => {
+        database.collection(MEALS).updateOne({_id: ObjectID(mealID)}, {$set:updatedMeal}, (err, result) => {
           if(err) {
+            console.log(err);
             next({success: false, data: "Couldn't update with your request"})
           } else {
             reservationLogic.addReservation(mealID, reserver, seatsNumber, next)

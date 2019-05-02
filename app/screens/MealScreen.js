@@ -40,7 +40,9 @@ export default class HomeScreen extends React.Component {
       mealObj: this.props.navigation.getParam('mealObj', {}),
       dialogVisible: false,
       resSeats: '',
-      refreshing: false
+      refreshing: false,
+      alertText: '',
+      alertVisible: 'none'
     }
     
     getSessionID().then((id)=>{
@@ -49,7 +51,7 @@ export default class HomeScreen extends React.Component {
     getUserEmail().then((addy)=>{
       this.setState({email: addy});
     });
-    
+
     this.convertMonth = this.convertMonth.bind(this);
     this.convertDay = this.convertDay.bind(this);
     this.convertYear = this.convertYear.bind(this);
@@ -125,20 +127,29 @@ export default class HomeScreen extends React.Component {
         .then(res => res.json())
         .then(response => {
           console.log(response);
-          this.setState({ refreshing: false, mealArray: response.data });
-          //console.log(response.data[0]);
+          if (response.success){
+            this.setState({ refreshing: false });
+            this.setState({ alertText: "Success! Your reservation is confirmed.", 
+                            alertVisible: '' });
+            //return();
+          }
+          
+          //console.log(this.state.mealArray);
         })
         .catch(err => {
           //console.error('Error:', err);
-          Alert.alert("Error! Couldn't connect to server.");
           this.setState({ refreshing: false });
+          this.setState({ alertText: "Error! Couldn't connect to server.", 
+                            alertVisible: '' });
+          //return("Error! Couldn't connect to server.")
         });
   }
 
   render() {
     const {
       mealObj,
-      resSeats
+      resSeats,
+      alertVisible
     } = this.state;
     //console.log(mealObj);
     return (
@@ -152,7 +163,10 @@ export default class HomeScreen extends React.Component {
           }>
           
             <Image source={{ uri: mealObj.image }} style={{width:'100%', height: 200}} />
-            
+          <Text style={{backgroundColor:"#03A9F4", color:"#eee", width:'100%', height:50,
+                        paddingTop:7, paddingLeft:12, fontSize:20, display:alertVisible}}>
+            {this.state.alertText}
+          </Text>
           <View style={{padding:15}}>
             <View style={{flex:1, flexDirection:'row', 
             borderBottomWidth: 1, paddingBottom:10, borderColor:'#bbb'}}>

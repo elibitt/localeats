@@ -66,7 +66,7 @@ export default class HomeScreen extends React.Component {
     getSessionID().then((id)=>{
       this.setState({sessionID: id},
       () =>{
-        console.log(this.state.sessionID);
+        //console.log(this.state.sessionID);
         fetch(API_URL+'/api/meals/getOpenMeals', {
           method: 'POST',
           headers: {

@@ -35,8 +35,8 @@ Takes in a meal_id: string, seatsNumber: integer
 router.post("/reserveSeats", (req, res, next) => {
   var mealID = req.body.mealID;
   var username = req.root.username;
-  var seatsNumber = req.seatsNumber;
-  mealsLogic.reserveSeats(mealID, username, seatsNumnber, (obj) => res.json(obj))
+  var seatsNumber = req.body.seatsNumber;
+  mealsLogic.reserveSeats(mealID, username, seatsNumber, (obj) => res.json(obj))
 })
 
 router.post("/unreserveSeats", (req,res, next) => {

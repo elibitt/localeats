@@ -19,5 +19,3 @@ exports[`Create meal screen correctly renders 1`] = `
   />
 </View>
 `;
-
-exports[`renders correctly 1`] = `null`;

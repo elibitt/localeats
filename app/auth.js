@@ -1,8 +1,11 @@
 import { AsyncStorage } from "react-native";
 import { API_URL } from './constants/apiSource';
-
+import {
+  Alert,
+} from 'react-native';
 export const USER_KEY = "auth-session-id";
 export const USER_EMAIL = "current-user-email";
+export const RESERVATIONS = "user-reservations";
 
 export const onSignIn = async (sessionID, email) => {
   // Save session ID to storage
@@ -52,6 +55,34 @@ export const isSignedIn = () => {
 			.catch(err => reject(err));
 	});
 };
+
+// export const onReserveSeats = async (mealID) => {
+//   // Save session ID to storage
+//   //console.log(sessionID);
+//   //console.log(email);
+//   var value, curRes;
+//   try {
+//     value = await AsyncStorage.getItem(RESERVATIONS).then(
+//         (item) => {
+//           curRes = item;
+//         });
+//   } catch (error) {
+//     console.log("Error getting sessionID from async storage");
+//   }
+//   if (curRes != null){
+//     curRes = curRes.push(mealID);
+//   }
+//   else{
+//     curRes = [mealID];
+//   }
+  
+//   try {
+//     await AsyncStorage.setItem(RESERVATIONS, curRes);
+//   } catch (error) {
+//     console.log("Error saving sessionID/email to async storage");
+//   }
+  
+// };
 
 export const getSessionID = async () => {
 	var value, collect;

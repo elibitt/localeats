@@ -3,7 +3,9 @@ import renderer from 'react-test-renderer';
 
 import SignIn from '../SignIn';
 
-test('renders correctly', () => {
-  const tree = renderer.create(<SignIn />).toJSON();
-  expect(tree).toMatchSnapshot();
+describe('Create signin screen', () => {
+  it('correctly renders', () => {
+    const tree = renderer.create(<SignIn />).toJSON();
+    expect(tree).toMatchSnapshot();
+  });
 });

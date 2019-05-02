@@ -3,7 +3,9 @@ import renderer from 'react-test-renderer';
 
 import HomeScreen from '../HomeScreen';
 
-test('renders correctly', () => {
-  const tree = renderer.create(<HomeScreen />).toJSON();
-  expect(tree).toMatchSnapshot();
+describe('Create home screen', () => {
+  it('correctly renders', () => {
+    const tree = renderer.create(<HomeScreen />).toJSON();
+    expect(tree).toMatchSnapshot();
+  });
 });

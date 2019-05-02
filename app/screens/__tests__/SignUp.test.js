@@ -3,7 +3,9 @@ import renderer from 'react-test-renderer';
 
 import SignUp from '../SignUp';
 
-test('renders correctly', () => {
-  const tree = renderer.create(<SignUp />).toJSON();
-  expect(tree).toMatchSnapshot();
+describe('Create signup screen', () => {
+  it('correctly renders', () => {
+    const tree = renderer.create(<SignUp />).toJSON();
+    expect(tree).toMatchSnapshot();
+  });
 });

@@ -57,7 +57,6 @@ signInRouter.post('/login', (req, res, next) => {
               res.json({success: false, data: "An error occurred"})
             }
             else {
-              console.log("SERVER", username, newID)
               res.json({success: true, sessionID: newID})
             }
           })

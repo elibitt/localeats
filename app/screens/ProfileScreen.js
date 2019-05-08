@@ -38,7 +38,7 @@ export default class SettingsScreen extends React.Component {
   render() {
     return (
       <View style={{ paddingVertical: 20 }}>
-        <Card title="John Doe">
+        <Card title={"Welcome!"}>
           <View
             style={{
               backgroundColor: "#bcbec1",
@@ -51,7 +51,7 @@ export default class SettingsScreen extends React.Component {
               marginBottom: 20
             }}
           >
-            <Text style={{ color: "white", fontSize: 28 }}>JD</Text>
+            <Text style={{ color: "white", fontSize: 28 }}>{this.state.email[0]}</Text>
           </View>
           <Text style={{ alignSelf: "center", fontSize: 13, marginBottom:20 }}>{"SessionID: "+this.state.sessionID}</Text>
           <Text style={{ alignSelf: "center", fontSize: 13, marginBottom:20 }}>{"Email: "+this.state.email}</Text>

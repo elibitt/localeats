@@ -58,6 +58,7 @@ export default class HomeScreen extends React.Component {
     this.convertTime = this.convertTime.bind(this);
     this.handleReservation = this.handleReservation.bind(this);
 
+    console.log(this.props.navigation.getParam('mealObj', {}));
   }
   static navigationOptions = {
     title: 'Meal Info',
@@ -80,7 +81,10 @@ export default class HomeScreen extends React.Component {
   handleDialogSubmit = () => {
     // The user has pressed the "Reserve" button
     this.setState({ dialogVisible: false });
-    this.handleReservation(this.state.mealObj._id, parseInt(this.state.resSeats));
+    if (this.state.resSeats > 0 && this.state.resSeats < this.state.mealObj.openSeats){
+      this.handleReservation(this.state.mealObj._id, parseInt(this.state.resSeats));
+    }
+    //this.props.navigation.getParam('callbackRefresh', {});
   };
 
   convertMonth(datetime){
@@ -130,7 +134,7 @@ export default class HomeScreen extends React.Component {
           if (response.success){
             this.setState({ refreshing: false });
             this.setState({ alertText: "Success! Your reservation is confirmed.", 
-                            alertVisible: '' });
+                            alertVisible: 'flex' });
             //return();
           }
           
@@ -140,7 +144,7 @@ export default class HomeScreen extends React.Component {
           //console.error('Error:', err);
           this.setState({ refreshing: false });
           this.setState({ alertText: "Error! Couldn't connect to server.", 
-                            alertVisible: '' });
+                            alertVisible: 'flex' });
           //return("Error! Couldn't connect to server.")
         });
   }

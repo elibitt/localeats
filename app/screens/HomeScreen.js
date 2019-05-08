@@ -43,6 +43,8 @@ export default class HomeScreen extends React.Component {
     this.convertMonth = this.convertMonth.bind(this);
     this.convertDay = this.convertDay.bind(this);
     this.onPressed = this.onPressed.bind(this);
+    this._onRefresh = this._onRefresh.bind(this);
+
 
 
   }
@@ -79,8 +81,10 @@ export default class HomeScreen extends React.Component {
         .then(res => res.json())
         .then(response => {
           //console.log(response.data);
-          this.setState({ refreshing: false, mealArray: response.data });
-          //console.log(response.data[0]);
+          if(response.success){
+            this.setState({ refreshing: false, mealArray: response.data });
+        }
+          //console.log(response.data);
         })
         .catch(err => {
           //console.error('Error:', err);
@@ -136,7 +140,7 @@ export default class HomeScreen extends React.Component {
   onPressed(meal){
     this.props.navigation.navigate(
       'Meal',
-      {mealObj: meal}
+      {mealObj: meal, callbackRefresh: this._onRefresh}
     );
   }
 
@@ -152,6 +156,7 @@ export default class HomeScreen extends React.Component {
         )
     }
     return (
+
       this.state.mealArray.map((c, i) => {
         return [
         <TouchableOpacity key={i} onPress={() => this.onPressed(this.state.mealArray[i])} >
@@ -316,8 +321,6 @@ const styles = StyleSheet.create({
   },
 });
 
-const tempArray = [
-  { "seats" : 6, "address" : "151 N Craig St, Pittsburgh, PA 15213, USA", "coordinates" : { "lat" : 40.4490241, "lng" : -79.95060149999999 }, "name" : "Fluffy Pancakes!", "description" : "They’re my grandmother’s recipe, everyone loves them!", "datetime" : "05-12-2019 11:00", "price" : 0, "image" : "https://exponent-file-upload-example.s3.amazonaws.com/1556593554310.png", "host" : "test@test.co", "openSeats" : 6, "diners" : [ ] },
-  { "seats" : 4, "address" : "4548 Carroll St, Pittsburgh, PA 15224, USA", "coordinates" : { "lat" : 40.4652846, "lng" : -79.9507045 }, "name" : "Julia’s Burritos", "description" : "I’ve been making burritos since I was a little girl, I’d love to share them with you", "datetime" : "05-21-2019 17:00", "price" : 5, "image" : "https://exponent-file-upload-example.s3.amazonaws.com/1556593645790.png", "host" : "test@test.co", "openSeats" : 4, "diners" : [ ] },
-  { "seats" : 4, "address" : "5708 Walnut St, Pittsburgh, PA 15232, USA", "coordinates" : { "lat" : 40.452171, "lng" : -79.930131 }, "name" : "Hipster Avocado Toast", "description" : "Why did the hipster burn his tongue?... He started eating before it was cool.", "datetime" : "05-03-2019 14:00", "price" : 26, "image" : "https://exponent-file-upload-example.s3.amazonaws.com/1556593732202.png", "host" : "test@test.co", "openSeats" : 4, "diners" : [ ] }
-]
+const tempArray = [{ "seats" : 6, "address" : "151 N Craig St, Pittsburgh, PA 15213, USA", "coordinates" : { "lat" : 40.4490241, "lng" : -79.95060149999999 }, "name" : "Fluffy Pancakes!", "description" : "They’re my grandmother’s recipe, everyone loves them!", "datetime" : "05-12-2019 11:00", "price" : 0, "image" : "https://exponent-file-upload-example.s3.amazonaws.com/1556593554310.png", "cookName" : "Lysa Arryn", "cookPicture" : "https://www.hbo.com/content/dam/hbodata/series/game-of-thrones/character/s5/lysa-arryn-1920.jpg/_jcr_content/renditions/cq5dam.web.1200.675.jpeg", "cookRating" : 4.6,"host" : "test@test.co", "openSeats" : 6, "diners" : [ ] },{ "seats" : 12, "address" : "4548 Carroll St, Pittsburgh, PA 15224, USA", "coordinates" : { "lat" : 40.4652846, "lng" : -79.9507045 }, "name" : "Fresh Caught Seafood Burritos", "description" : "I’ve been making burritos since I was a little boy, I’d love to share them with you", "datetime" : "06-02-2019 17:00", "price" : 5, "image" : "https://exponent-file-upload-example.s3.amazonaws.com/1556593645790.png", "cookName" : "Davos Seaworth", "cookPicture" : "", "cookRating" : 4.9, "host" : "test@test.co", "openSeats" : 12, "diners" : [ ] },{ "seats" : 4, "address" : "5708 Walnut St, Pittsburgh, PA 15232, USA", "coordinates" : { "lat" : 40.452171, "lng" : -79.930131 }, "name" : "Hipster Avocado Toast", "description" : "Why did the hipster burn his tongue?... He started eating before it was cool.", "datetime" : "05-03-2019 14:00", "price" : 26, "image" : "https://exponent-file-upload-example.s3.amazonaws.com/1556593732202.png", "cookName" : "John Arryn", "cookPicture" : "https://s3.amazonaws.com/uifaces/faces/twitter/adhamdannaway/128.jpg", "cookRating" : 3.4, "host" : "test@test.co", "openSeats" : 4, "diners" : [ ] },{ "seats" : 3, "address" : "14th St & Smallman St, Pittsburgh, PA 15222, USA", "coordinates" : { "lat" : 40.4479676, "lng" : -79.99049749999999 }, "name" : "Homemade Sushi Rolls", "description" : "They’re so good, you’re going to love them!", "datetime" : "05-29-2019 17:30", "price" : 12, "image" : "https://exponent-file-upload-example.s3.amazonaws.com/1556647659937.png", "cookName" : "Sherri Melisandre", "cookPicture" : "https://s3.amazonaws.com/uifaces/faces/twitter/ladylexy/128.jpg", "cookRating" : 4.4, "host" : "test@test.co", "openSeats" : 3, "diners" : [ ] }]
+
+

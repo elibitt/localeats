@@ -32,7 +32,6 @@ export default class HomeScreen extends React.Component {
     super(props);
 
     this.state = {
-      isLoading: true,
       sessionID: '',
       email: '',
       mealArray: [],

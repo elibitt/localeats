@@ -67,3 +67,5 @@ data-node/
 .DS_Store
 .nosync
 .env
+server/__tests__/db_files/
+

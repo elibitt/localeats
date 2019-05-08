@@ -1,6 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const mealsLogic = require('./mealsLogic')
+const reservationLogic = require('./reservationLogic')
 
 
 router.post("/addMeal", (req, res, next) => {
@@ -40,7 +41,15 @@ router.post("/reserveSeats", (req, res, next) => {
 })
 
 router.post("/unreserveSeats", (req,res, next) => {
-  
+  var mealID = req.body.mealID;
+  var username = req.root.username;
+  var seatsNumber = req.body.seatsNumber;
+  mealsLogic.unreserveSeats(mealID, username, seatsNumber, (obj) => res.json(obj))
+})
+
+router.post("/getReservations", (req,res, next) => {
+  var username = req.root.username;
+  mealsLogic.getReservations(username, (obj) => res.json(obj))
 })
 
 

@@ -1,7 +1,6 @@
 const express = require('express');
 const path = require('path');
 const router = express.Router();
-const mealsLogic = require('./mealsLogic')
 const ObjectID = require('mongodb').ObjectID
 
 
@@ -11,7 +10,7 @@ var database
 mongoSetup.getDatabase((db) => {database = db});
 const RESERV = "reservations"
 
-const addReservation = (mealID, seats, reserver, next) => {
+const addReservation = (reserver, mealID, seats, next) => {
   database.collection(RESERV).insertOne({username: reserver, mealID: ObjectID(mealID), seats: seats},
     (err, result) => {
       if(err) {
@@ -24,7 +23,7 @@ const addReservation = (mealID, seats, reserver, next) => {
     })
 }
 
-const deleteReservation = (mealId, reserver, mealID, next) => {
+const deleteReservation = (reserver, mealID, seats, next) => {
   database.collection(RESERV).removeOne({username: reserver, mealID: ObjectID(mealID), seats: seats},
     (err, result) => {
       if(err) {
@@ -32,28 +31,20 @@ const deleteReservation = (mealId, reserver, mealID, next) => {
         next({success: false, data: "Error occurred in database reservation deletion"})
       }
       else {
-        next({success: true, data: "reservationCanceled"})
+        next({success: true, data: "Reservation Canceled"})
       }
     })
 }
 
 const getReservations = (reserver, next) => {
-  database.collection(RESERV).find({username: reserver}, (err, result) => {
+  // database.collection(RESERV).find({username: reserver}).toArray((err, result) => {
+  database.collection(RESERV).find({username: reserver}).toArray((err, result) => {
       if(err) {
         console.log(error)
         next({success: false, data: "Error occurred in database reservation retrieval"})
       }
       else {
-        mealsLogic.getMeals(result.map(x => x._id), (meals) => {
-          mealsDict = {}
-          for (var meal in meals) {
-              mealsDict[meal._id] = meal
-          }
-          for (var reservation in result) {
-            reservation["meal"] = mealsDict[result.mealID]
-          }
-          next({success: true, data: result})
-        })
+        next(result)
       }
     })
 }

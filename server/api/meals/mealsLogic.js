@@ -26,7 +26,7 @@ const makeMealObject = (meal, hostName) => {
 }
 
 const getMeals = (mealIDs, next) => {
-    database.collection(MEALS).find({_id: {$in: mealIDs.map((id) => ObjectID(id))}}, (err, result) => {
+    database.collection(MEALS).find({_id: {$in: mealIDs.map((id) => ObjectID(id))}}).toArray((err, result) => {
       if(err) {
         console.log(err)
         next({})
@@ -102,14 +102,14 @@ const reserveSeats = (mealID, reserver, seatsNumber, next) => {
         var updatedMeal = Object.assign(result,
           {
             openSeats: result.openSeats - seatsNumber,
-            diners: result.diners.concat([reserver, seatsNumber])
+            diners: result.diners.concat({diner: reserver, seatsReserved: seatsNumber})
           })
         database.collection(MEALS).updateOne({_id: ObjectID(mealID)}, {$set:updatedMeal}, (err, result) => {
           if(err) {
             console.log(err);
             next({success: false, data: "Couldn't update with your request"})
           } else {
-            reservationLogic.addReservation(mealID, reserver, seatsNumber, next)
+            reservationLogic.addReservation(reserver, mealID, seatsNumber, next)
           }
         })
       } else {
@@ -125,18 +125,27 @@ const unreserveSeats = (mealID, reserver, seatsNumber, next) => {
       console.log(err)
       next({success: false, data: "Meal to reserve couldn't be found - a database error occurred"})
     } else {
-      if(diners.includes({diner:reserver, seatsReserved: seatsNumber})) {
+      if(result.diners.filter(x => x.diner == reserver && x.seatsReserved==seatsNumber).length > 0) {
+        var newDiners = [];
+        var deleted = false
+        for(var d in result.diners) {
+          if(d.diner == reserver && d.seatsReserved == seatsNumber && !deleted) {
+            deleted = true
+          } else {
+            newDiners.push(d)
+          }
+        }
         var updatedMeal = Object.assign(result,
           {
             openSeats: result.openSeats + seatsNumber,
-            diners: result.diners.filter(x => x.diner != reserver)
+            diners: newDiners
           })
-        database.collection(MEALS).updateOne({_id: ObjectID(meal_id)}, {updatedMeal}, (err, result) => {
+        database.collection(MEALS).replaceOne({_id: ObjectID(mealID)}, {updatedMeal}, (err, result) => {
           if(err) {
             console.log(err)
             next({success: false, data: "Couldn't update with your request - a database error occurred"})
           } else {
-            reservationLogic.deleteReservation(mealID, reserver, seatsNumber, next)
+            reservationLogic.deleteReservation(reserver, mealID, seatsNumber, next)
           }
         })
       } else {
@@ -146,11 +155,28 @@ const unreserveSeats = (mealID, reserver, seatsNumber, next) => {
   })
 }
 
+const getReservations = (reserver, next) => {
+  reservationLogic.getReservations(reserver, (result) => {
+        getMeals(result.map(x => x._id), (meals) => {
+          mealsDict = {}
+          for (var meal in meals) {
+              mealsDict[meal._id] = meal
+          }
+          for (var reservation in result) {
+            reservation["meal"] = mealsDict[result.mealID]
+          }
+          next({success: true, data: result})
+        })
+  })
+}
+
 module.exports = {
+  getMeals,
   addMeal,
   deleteMeal,
   getMyMeals,
   getOpenMeals,
   reserveSeats,
-  unreserveSeats
+  unreserveSeats,
+  getReservations
 }

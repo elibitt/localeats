@@ -58,10 +58,12 @@ export default class HomeScreen extends React.Component {
     this.convertTime = this.convertTime.bind(this);
     this.handleReservation = this.handleReservation.bind(this);
 
+    console.log(this.props.navigation.getParam('mealObj', {}));
   }
   static navigationOptions = {
     title: 'Meal Info',
   };
+
   _onRefresh = () => {
     setTimeout(() => {
             console.log('Done Refreshing');
@@ -80,7 +82,14 @@ export default class HomeScreen extends React.Component {
   handleDialogSubmit = () => {
     // The user has pressed the "Reserve" button
     this.setState({ dialogVisible: false });
-    this.handleReservation(this.state.mealObj._id, parseInt(this.state.resSeats));
+    if (this.state.resSeats > 0 && this.state.resSeats <= this.state.mealObj.openSeats){
+      this.handleReservation(this.state.mealObj._id, parseInt(this.state.resSeats));
+    }
+    else{
+      this.setState({ alertText: "Uh oh, there aren't enough seats left :(", 
+                            alertVisible: 'flex' });
+    }
+    //this.props.navigation.getParam('callbackRefresh', {});
   };
 
   convertMonth(datetime){
@@ -130,7 +139,11 @@ export default class HomeScreen extends React.Component {
           if (response.success){
             this.setState({ refreshing: false });
             this.setState({ alertText: "Success! Your reservation is confirmed.", 
-                            alertVisible: '' });
+                            alertVisible: 'flex' });
+            var newMealObj = this.state.mealObj;
+            newMealObj.openSeats -= numSeats;
+            this.setState({mealObj:newMealObj});
+            this.props.navigation.state.params.callbackRefresh();
             //return();
           }
           
@@ -140,7 +153,7 @@ export default class HomeScreen extends React.Component {
           //console.error('Error:', err);
           this.setState({ refreshing: false });
           this.setState({ alertText: "Error! Couldn't connect to server.", 
-                            alertVisible: '' });
+                            alertVisible: 'flex' });
           //return("Error! Couldn't connect to server.")
         });
   }
@@ -162,7 +175,8 @@ export default class HomeScreen extends React.Component {
             />
           }>
           
-            <Image source={{ uri: mealObj.image }} style={{width:'100%', height: 200}} />
+            <Image source={mealObj.image != '' ? { uri: mealObj.image} : require('../assets/images/food/meal-placeholder.png') } 
+                    style={{width:'100%', height: 200}} />
           <Text style={{backgroundColor:"#03A9F4", color:"#eee", width:'100%', height:50,
                         paddingTop:7, paddingLeft:12, fontSize:20, display:alertVisible}}>
             {this.state.alertText}

@@ -1,6 +1,7 @@
 # localeats
 ## Running The App
 Must install Expo CLI `npm install expo-cli --global`
+
 From the /app directory run `npm start`
 
 To change the source of the api from Azure to localhost, see /app/constants/apiSource.js

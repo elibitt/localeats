@@ -1,3 +1,4 @@
+[![Build Status](https://travis-ci.com/elibitt/localeats.svg?branch=master)](https://travis-ci.com/elibitt/localeats)
 # localeats
 ## Running The App
 Must install Expo CLI `npm install expo-cli --global`

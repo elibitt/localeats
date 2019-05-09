@@ -160,7 +160,7 @@ export default class HomeScreen extends React.Component {
         return [
         <TouchableOpacity key={i} onPress={() => this.onPressed(this.state.mealArray[i])} >
           <Card
-            image={{ uri: c.image }}
+            image={c.image != '' ? { uri: c.image} : require('../assets/images/food/meal-placeholder.png') } 
             featuredTitle={c.price > 0 ? "$"+c.price.toString() : "FREE"}
             featuredTitleStyle={{
               alignSelf:'flex-end', bottom:45, marginRight:10,
@@ -237,16 +237,12 @@ export default class HomeScreen extends React.Component {
           style={styles.container}
           contentContainerStyle={styles.contentContainer}
         >
-          <View style={styles.welcomeContainer}>
-            <Image
-              source={require('../assets/images/logov1.png')}
-              style={styles.welcomeImage}
-              PlaceholderContent={<ActivityIndicator />}
-
-            />
-          </View>
-
-            <Text style={styles.welcomeText}>Welcome to LocalEats!</Text>
+        <View style={{alignItems:'center', textAlign:'center'}}>
+          <Text style={styles.welcomeText}>Welcome to LocalEats!</Text>
+          <Text style={{textAlign: 'center', margin:10}}>
+          Browse available meals below or visit the Create screen to offer up your own meal!
+          </Text>
+        </View>
           <View>
             {this.renderMealCards()} 
           </View>

@@ -31,6 +31,7 @@ import { getSessionID, getUserEmail } from "../auth";
 import KeyboardAwareScrollView from "../components/keyboardAware/KeyboardAwareScrollView";
 import { API_URL } from '../constants/apiSource';
 import ImgUpload from '../components/imageUpload';
+import ProfImgUpload from '../components/profileImageUpload';
 import DatePicker from 'react-native-datepicker';
 import GooglePlacesInput from '../components/addressInput';
 
@@ -53,35 +54,87 @@ export default class CreateScreen extends React.Component {
       isMealNameValid: true,
       isMealAddressValid: true,
       isMealTimeValid: true,
+      isCookNameVaild: true,
       priceIndex: 0,
       mealPrice: '',
       isLoading: false,
       formVisible: 'none',
       introVisible: '',
       imgURL: '',
+      profImgURL: '',
+      displayName: '',
+      foundUserData: false,
       datetime: '',
       displayAddress: '',
       coordinatesObj: {"lat": '', "lng": ''},
-      cookName: '',
-      cookPicture: '',
-      cookRating: 0,
+      cookRating: 4.5,
     }
     this.submitMeal = this.submitMeal.bind(this);
     this.showForm = this.showForm.bind(this);
     this.hideForm = this.hideForm.bind(this);
     this.saveImage = this.saveImage.bind(this);
+    this.saveProfImage = this.saveProfImage.bind(this);
     this.saveAddress = this.saveAddress.bind(this);
-    this.updateIndex = this.updateIndex.bind(this)
+    this.updateIndex = this.updateIndex.bind(this);
+    this.setDisplayName = this.setDisplayName.bind(this);
 
-    getSessionID().then((id)=>{
-      this.setState({sessionID: id});
-    });
-    getUserEmail().then((addy)=>{
-      this.setState({email: addy});
-    });
+    // getSessionID().then((id)=>{
+    //   this.setState({sessionID: id});
+    // });
+    // getUserEmail().then((addy)=>{
+    //   this.setState({email: addy});
+    // });
 
   }
   static navigationOptions = {title: 'Create New Meal',};
+
+  componentWillMount(){
+
+    getUserEmail().then((addy)=>{
+      this.setState({email: addy},
+      () =>{
+        getSessionID().then((id)=>{
+          this.setState({sessionID: id},
+          () =>{
+            //START GET USER INFO API FETCH
+            fetch(API_URL+'/api/user/getInfo', {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+              },
+              body: JSON.stringify({
+                sessionID: this.state.sessionID,
+                username: this.state.email
+              })
+            })
+            .then(res => res.json())
+            .then(response => {
+              //console.log(response.data);
+              if(response.success){
+                //console.log(response.data);
+                if(response.data.info.hasOwnProperty('displayName')){
+                  this.setState({foundUserData: true, 
+                        displayName:response.data.info.displayName});
+                }
+                if(response.data.info.hasOwnProperty('picURL')){
+                  this.setState({profImgURL:response.data.info.picURL});
+                }
+              }
+              else{
+                //Alert.alert("Error! Bad server response.");
+                console.log(response.data);
+              }
+            })
+            .catch(err => {
+              console.log('Error:', err);
+              //Alert.alert("Error! Couldn't connect to server.");
+              //this.setState({ refreshing: false });
+            }); //END GET USER INFO API FETCH
+          }); //set state sessionID
+        }); //get sessionID        
+      }); //set state email
+    }); //get email
+  } // componentWillMount
 
   updateIndex (selectedIndex) {
     this.setState({priceIndex: selectedIndex});
@@ -92,6 +145,78 @@ export default class CreateScreen extends React.Component {
 
   saveImage(imgsrc) {
     this.setState({ imgURL: imgsrc });
+  }
+
+  saveProfImage(imgsrc) {
+    this.setState({ profImgURL: imgsrc });
+    //START SET USER INFO API FETCH
+      fetch(API_URL+'/api/user/setInfo', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          sessionID: this.state.sessionID,
+          info: {displayName: this.state.displayName,
+                  picURL: imgsrc}
+        })
+      })
+      .then(res => res.json())
+      .then(response => {
+        //console.log(response.data);
+        if(response.success){
+          //console.log(response.data);
+          //this.setState({foundUserData: true});
+        }
+        else{
+          //Alert.alert("Error! Bad server response.");
+          console.log(response.data);
+          //this.setState({ refreshing: false });
+        }
+        //console.log(response.data);
+      })
+      .catch(err => {
+        console.log('Error:', err);
+        Alert.alert("Error saving image to server.");
+        //this.setState({ refreshing: false });
+      });
+      //END SET USER INFO API FETCH
+  }
+
+  setDisplayName(){
+    //START GET USER INFO API FETCH
+      fetch(API_URL+'/api/user/setInfo', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          sessionID: this.state.sessionID,
+          info: {displayName: this.state.displayName,
+                  picURL: this.state.profImgURL}
+        })
+      })
+      .then(res => res.json())
+      .then(response => {
+        //console.log(response.data);
+        if(response.success){
+          console.log(response.data);
+          this.setState({foundUserData: true});
+        }
+        else{
+          //Alert.alert("Error! Bad server response.");
+          console.log(response.data);
+          //this.setState({ refreshing: false });
+        }
+        //console.log(response.data);
+      })
+      .catch(err => {
+        console.log('Error:', err);
+        Alert.alert("Error! Couldn't connect to server.");
+        //this.setState({ refreshing: false });
+      });
+      //END GET USER INFO API FETCH
+      this.setState({foundUserData: true});
   }
 
   saveAddress(displayAddy, coordinates) {
@@ -122,13 +247,14 @@ export default class CreateScreen extends React.Component {
             isMealDescValid,
             isMealNameValid,
             isMealAddressValid,
+            isCookNameVaild,
             imgURL,
             datetime,
             mealPrice,
             displayAddress,
             coordinatesObj,
-            cookName,
-            cookPicture,
+            displayName,
+            profImgURL,
             cookRating } = this.state;
     this.setState({ isLoading: true }); //set spinner
 
@@ -137,9 +263,12 @@ export default class CreateScreen extends React.Component {
       isMealNameValid: mealName.length > 1,
       isMealDescValid: mealDesc.length > 1,
       isMealAddressValid: displayAddress.length > 1,
-      isMealTimeValid: datetime.length > 1
+      isMealTimeValid: datetime.length > 1,
+      isCookNameVaild: displayName.length > 1
     }, () => {
-      if (mealName.length > 1 && datetime.length > 1 && mealDesc.length > 1 && displayAddress.length > 1){
+      if (mealName.length > 1 && datetime.length > 1 && 
+          mealDesc.length > 1 && displayAddress.length > 1 &&
+          displayName.length > 1){
         //create Meal object
         const mealObject = {
           seats: mealSeats,
@@ -150,9 +279,10 @@ export default class CreateScreen extends React.Component {
           datetime: datetime,
           price: mealPrice > 0 ? parseInt(mealPrice) : 0,
           image: imgURL,
-          cookName: cookName,
-          cookPicture: cookPicture,
-          cookRating: cookRating
+          cookName: displayName,
+          cookPicture: profImgURL,
+          cookRating: cookRating,
+          cookEmail: email
         }
         //send to API
         fetch(API_URL+'/api/meals/addMeal', {
@@ -167,9 +297,12 @@ export default class CreateScreen extends React.Component {
         }).then(res => res.json())
         .then(response => {
           console.log(response);
-          Alert.alert("Meal was uploaded successfully!");
-          this.hideForm();
-          this.setState({ isLoading: false });
+          setTimeout(() => {
+            this.hideForm();
+            this.setState({ isLoading: false });
+            Alert.alert("Meal was uploaded successfully!");
+          }, 500);
+          
         })
         .catch(err => {
           //console.error('Error:', err);
@@ -213,12 +346,13 @@ export default class CreateScreen extends React.Component {
       isMealAddressValid,
       isMealDescValid,
       isMealNameValid,
+      isCookNameVaild,
       formVisible,
       introVisible,
       priceIndex,
       mealPrice,
-      cookName,
-      cookPicture,
+      displayName,
+      profImgURL,
       cookRating
     } = this.state;
     const priceButtons = ["I'll keep it free", "I'd like to charge"];
@@ -365,31 +499,42 @@ export default class CreateScreen extends React.Component {
               }}
               />
         </Card>
-        <Card title="Last thing...">
-          <Input inputStyle={{ marginLeft: 10 }}
-              placeholder={'Enter your name'} 
-              keyboardAppearance={"light"}
-              blurOnSubmit={true}
-              value={cookName}
-              ref={input => {(this.cookNameInput = input);}}
-              onChangeText={cookName => this.setState({ cookName })}
-              containerStyle={{
-                marginTop: 16,
-                borderBottomColor: 'rgba(0, 0, 0, 0.38)',
-              }}
-              />
-          <Input inputStyle={{ marginLeft: 10 }}
-              placeholder={'Enter your picture URL'} 
-              keyboardAppearance={"light"}
-              blurOnSubmit={true}
-              value={cookPicture}
-              ref={input => {(this.cookPictureInput = input);}}
-              onChangeText={cookPicture => this.setState({ cookPicture })}
-              containerStyle={{
-                marginTop: 16,
-                borderBottomColor: 'rgba(0, 0, 0, 0.38)',
-              }}
-              />
+        <Card title="About the chef">
+          <ProfImgUpload 
+            saveImage={this.saveProfImage}
+            username={this.state.email} 
+            sessionID={this.state.sessionID}/>
+          {this.state.foundUserData ? 
+            <View>
+            <Text style={{alignSelf:'center', fontSize: 24}}>{this.state.displayName}</Text>
+            <Button type="clear" title="Edit Name" 
+            onPress={() => this.setState({foundUserData:false})} />
+            
+            </View>
+            :
+            <Input inputStyle={{ marginLeft: 10 }}
+                    placeholder={"Please enter your name"} 
+                    keyboardAppearance="light"
+                    returnKeyType='done'
+                    blurOnSubmit={true}
+                    value={this.state.displayName}
+                    ref={input => {(this.displayNameInput = input);}}
+                    onSubmitEditing={this.setDisplayName}
+                    onBlur={this.setDisplayName}
+                    errorMessage={
+                    isCookNameVaild
+                      ? null
+                      : 'Please enter your name'
+                    }
+                    onChangeText={displayName => this.setState({ displayName })}
+                    containerStyle={{
+                      marginTop: 16,
+                      borderBottomColor: 'rgba(0, 0, 0, 0.38)',
+                    }}/>
+          }
+
+
+          {/*
           <Rating
             imageSize={40}
             startingValue={cookRating}
@@ -397,14 +542,13 @@ export default class CreateScreen extends React.Component {
             style={{marginTop:20}}
             showRating
             fractions={1}
-          />
+          />*/}
         </Card>
           <View style={{alignItems:"center", marginBottom: 25}}>
           <Button
             buttonStyle={styles.submitButton}
             containerStyle={{ marginTop: 32, flex: 0 }}
             activeOpacity={0.8}
-            placeholder={"Select the date & time of your meal"}
             title='CREATE MEAL'
             onPress={this.submitMeal}
             titleStyle={styles.submitTextButton}
